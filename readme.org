@@ -1,0 +1,953 @@
+#+TITLE: Emacs
+#+STARTUP: content
+#+TODO: inactive 
+#+PROPERTY: header-args :results silent
+
+* Package locations
+
+Sources
+
+#+BEGIN_SRC emacs-lisp 
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
+#+END_SRC
+
+Custom local path
+
+#+BEGIN_SRC emacs-lisp 
+(add-to-list 'load-path "/home/m/.emacs.d/personal/packages/")
+#+END_SRC
+
+
+* Edit Emacs
+
+Assuming this file is located outside =~/.emacs.d= for backup purposes, copy this file back when it gets saved.
+
+#+BEGIN_SRC emacs-lisp 
+(defun m/onsave_emacs()
+  
+  (let (
+        (m/pwd "/home/m/auricio/boot/emacs/emacs.org") ;; editing path
+        (m/emacsd "/home/m/.emacs.d/")) ;; load path
+    
+    (when (string= buffer-file-name m/pwd)
+      (copy-file m/pwd m/emacsd t)
+      (message (concat "Copied to " m/emacsd)))))
+
+(add-hook 'after-save-hook 'm/onsave_emacs)
+#+END_SRC
+
+Whenever I save my personal theme, which I keep in an org-mode document, tangle and recompile it, copy it back to a place recognized by =custom-theme-load-path=, and load back the theme into existance.
+
+#+BEGIN_SRC emacs-lisp 
+(add-to-list 'custom-theme-load-path "/home/m/.emacs.d/personal/theme/")
+
+(defun m/onsave_theme()
+  
+  (let (
+        (m/themepath "/home/m/auricio/boot/emacs/theme/") ;; editing path
+        (m/themename "personal") ;; theme name
+        (m/themenameload 'personal) ;; argument to load-theme
+        (m/themeload "/home/m/.emacs.d/personal/theme/") ;; load path
+        )
+
+        (when (string= buffer-file-name (concat m/themepath m/themename "-theme.org"))
+          (org-babel-tangle-file
+           (concat m/themepath m/themename "-theme.org")
+           (concat m/themepath m/themename "-theme.el"))
+          (byte-recompile-directory m/themepath)
+          (copy-directory m/themepath m/themeload nil nil t)
+          (load-theme m/themenameload t)
+          (message "Reloaded Theme")))
+          )
+    
+(add-hook 'after-save-hook 'm/onsave_theme)
+    
+#+END_SRC
+
+
+* Basic look
+
+Load theme
+
+#+BEGIN_SRC emacs-lisp 
+  (load-theme 'personal t)
+#+END_SRC
+
+Remove basic visual elements 
+
+#+BEGIN_SRC emacs-lisp 
+(setq inhibit-splash-screen t) ;; No intro
+(tool-bar-mode -1) ;; No toolbar
+(menu-bar-mode -99) ;; No menubar
+(setq visible-bell 1) ;; No bells
+(set-scroll-bar-mode nil) ;; No vertical scrollbar
+(setq horizontal-scroll-bar-mode nil) ;; No horizontal scrollbar
+(setq-default line-number-mode nil)
+(setq-default mode-line-format " ") ;; The simplest modeline
+
+#+END_SRC 
+
+Display words like you would expect in a modern editor
+
+#+BEGIN_SRC emacs-lisp 
+;; UTF-8
+(prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(setq default-buffer-file-coding-system 'utf-8)
+;; Wrap words
+(global-visual-line-mode t)
+;; Highlight the cursor line
+(global-hl-line-mode 1)
+(setq-default cursor-type 'box)
+;; Line spacing
+(setq-default line-spacing 3)
+#+END_SRC
+
+Have a huge fringe for visual comfort
+
+#+BEGIN_SRC emacs-lisp 
+(fringe-mode '(40 . 40))
+#+END_SRC
+
+Some visual elements are specific to writing, programming or temporary buffers, so I classify these.
+
+#+BEGIN_SRC emacs-lisp 
+(setq 
+ m/writing_modes
+ '(
+   org-mode-hook
+   pollen-mode-hook
+   )
+ m/programming_modes
+ '(
+   js-mode-hook
+   python-mode-hook
+   html-mode-hook
+   c-mode-hook
+   css-mode-hook
+   ruby-mode-hook
+   sh-mode-hook
+   kotlin-mode-hook
+   racket-mode-hook
+   conf-mode-hook
+   text-mode-hook
+   fundamental-mode-hook
+   emacs-lisp-mode-hook
+   )
+ m/temporary_modes
+ '(
+   lisp-interaction-mode-hook
+   Man-mode-hook
+   ))
+
+#+END_SRC
+
+A header for every type of buffer
+
+#+BEGIN_SRC emacs-lisp  
+(defun m/orgmodeheader ()
+  (if (string-match-p ".*\\.org\-." (buffer-name))
+      (nth 0 (split-string (nth 1 (split-string (buffer-name) ".org-")) "-"))
+    (nth 0 (split-string (file-name-nondirectory (buffer-file-name)) "\\."))))
+;; Display filename without extension or org-mode title or header name (in an indirect buffer)
+(defun m/headerclean ()
+  (setq header-line-format
+        '("     "
+	  (:eval (m/orgmodeheader))
+	  )))
+;; Display filename
+(defun m/headerfilename()
+  (setq header-line-format
+	'("     "
+	  (:eval (file-name-nondirectory (buffer-file-name)))
+	  )))
+;; Display buffer name
+(defun m/headerbuffername ()
+  (setq header-line-format
+	'("     "
+	  (:eval (buffer-name))
+	  )))
+;; Apply header to modes
+(defun m/header-apply (modes header)
+  (dolist (m/mode modes)
+    (add-hook m/mode header)))
+;; Apply
+(m/header-apply m/writing_modes 'm/headerclean)
+(m/header-apply m/programming_modes 'm/headerfilename)
+(m/header-apply m/temporary_modes 'm/headerbuffername)
+
+#+END_SRC
+
+Line numbers only for programming buffers
+
+#+BEGIN_SRC emacs-lisp 
+(setq linum-format "  %d ")
+;; Disable line numbers
+(defun m/islinum(modes linumstate)
+  (cond
+   ((= linumstate 0)
+    (dolist (m/mode modes)
+      (add-hook m/mode (lambda ()
+                         (linum-mode 0)))))
+   ((= linumstate 1)
+    (dolist (m/mode modes)
+      (add-hook m/mode (lambda ()
+                         (linum-mode 1)))))))
+
+;; Apply
+(m/islinum m/writing_modes 0)
+(m/islinum m/temporary_modes 0)
+(m/islinum m/programming_modes 1)
+
+#+END_SRC
+
+
+* Edit buffers
+
+Write over the selected range
+
+#+BEGIN_SRC emacs-lisp 
+(delete-selection-mode 1)
+
+#+END_SRC
+
+Move cursor up and down
+
+#+BEGIN_SRC emacs-lisp 
+(global-set-key (kbd "<up>") 'previous-line)
+(global-set-key (kbd "<down>") 'next-line)
+(setq-default line-move-visual nil)
+(global-set-key (kbd "<end>") 'end-of-line)
+(global-set-key (kbd "<home>") 'beginning-of-line)
+
+#+END_SRC
+
+Scroll up and down
+
+#+BEGIN_SRC emacs-lisp 
+;; Mouse scrolling
+(setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
+(setq mouse-wheel-progressive-speed nil)
+(setq mouse-wheel-follow-mouse 't)
+(setq scroll-step 1)
+;; Keyboard scrolling
+(defun m/scrolldown ()
+  (interactive)
+  (scroll-up 1))
+(defun m/scrollup ()
+  (interactive)
+  (scroll-down 1))
+;; Keys to scroll
+(global-set-key [(next)] 'm/scrolldown)
+(global-set-key [(prior)]   'm/scrollup)
+
+#+END_SRC
+
+Undo
+
+#+BEGIN_SRC emacs-lisp 
+(global-set-key (kbd "C-z") 'undo)
+
+#+END_SRC
+
+Select all 
+
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-a")  'mark-whole-buffer)
+  (define-key org-mode-map [(control a)] 'mark-whole-buffer)
+
+#+END_SRC
+
+Search
+
+#+BEGIN_SRC emacs-lisp 
+(with-eval-after-load 'helm-regexp
+  (setq helm-source-occur
+        (helm-make-source "Occur" 'helm-source-multi-occur :follow 1)))
+
+(define-key global-map (kbd "C-s") 'helm-occur)
+
+#+END_SRC
+
+Avoid automatic backup files
+
+#+BEGIN_SRC emacs-lisp 
+(setq make-backup-files nil)
+(setq auto-save-default nil)
+(setq create-lockfiles nil)
+
+#+END_SRC
+
+Revert buffer when changed on disk
+
+#+BEGIN_SRC emacs-lisp 
+(global-auto-revert-mode 1)
+
+#+END_SRC
+
+
+* Window operations
+
+Resize this window
+
+#+BEGIN_SRC emacs-lisp 
+(defhydra m/windowresize (:hint nil)
+  "← ↑ → ↓"
+  ("<left>" (shrink-window-horizontally 10))
+  ("<right>" (enlarge-window-horizontally 10))
+  ("<up>" (enlarge-window 10))
+  ("<down>" (shrink-window 10))
+  ("q" nil)
+  )
+(global-set-key (kbd "M-r") 'm/windowresize/body)
+
+#+END_SRC
+
+Kill this buffer
+
+#+BEGIN_SRC emacs-lisp 
+(global-set-key (kbd "C-x k") 'kill-this-buffer)
+#+END_SRC
+
+
+* Navigate buffers
+
+Move focus to other displayed windows
+
+#+BEGIN_SRC emacs-lisp 
+(global-set-key (kbd "M-s-<left>")  'windmove-left)
+(global-set-key (kbd "M-s-<right>") 'windmove-right)
+(global-set-key (kbd "M-s-<up>")    'windmove-up)
+(global-set-key (kbd "M-s-<down>")  'windmove-down)
+
+#+END_SRC
+
+Cycle through work buffers in order of recency
+
+#+BEGIN_SRC emacs-lisp 
+;; Set swbuff
+(require 'swbuff)
+(setq swbuff-recent-buffers-first t)
+(setq swbuff-separator " · ")
+;; Exclude these buffers
+(setq swbuff-exclude-buffer-regexps
+      '("^ "
+        "^\\*Messages\\*$"
+        "^\\*Buffer List\\*$"
+        "^\\*Backtrace\\*$"
+        "^\\*Warnings\\*$"
+        "^\\*WoMan-Log\\*$"
+        "^\\*Compile-Log\\*$"
+        "^\\*tramp/.+\\*$"
+        "^\\*Faces\\*$"
+        "^\\*evil-marks\\*$"
+        "^\\*evil-registers\\*$"
+        "^\\*Shell Command Output\\*$"
+        "^\\*helm[- ].+\\*$"
+        "^\\*magit\\(-\\w+\\)?: .+$"
+        "^\\*irc\\..+\\*$"))
+;; Keys to cycle
+(global-set-key [(C-next)] 'swbuff-switch-to-next-buffer)
+(global-set-key [(C-prior)]   'swbuff-switch-to-previous-buffer)
+
+#+END_SRC
+
+Go straight to a desired buffer
+
+#+BEGIN_SRC emacs-lisp :results silent 
+;; Set helm
+(require 'helm)
+(require 'helm-config)
+(helm-mode 1)
+(setq helm-full-frame nil)
+(setq helm-split-window-in-side-p t)
+(setq helm-split-window-default-side 'below)
+;; Avoid buffer details
+(setq helm-buffer-details-flag 'nil)
+;; Exclude these buffers
+(setq helm-boring-buffer-regexp-list
+      '("\\*helm"
+        "\\*helm-mode"
+        "\\*Echo Area"
+        "\\*Minibuf"
+        "\\ *code-conversion-work\\*"
+        "org-src-fontification.+"
+        "\\*helm-mode.+"
+        "\\*Compile-Log"
+        "\\*Org-Babel Error"))
+;; Keys to navigate
+(global-set-key (kbd "M-SPC") 'helm-mini)
+
+#+END_SRC
+
+Go straight to a set of bookmarks
+
+#+BEGIN_SRC emacs-lisp 
+(global-set-key (kbd "C-M-SPC") 'helm-filtered-bookmarks)
+
+#+END_SRC
+
+Open new buffer
+
+#+BEGIN_SRC emacs-lisp 
+(global-set-key (kbd "C-x C-f") 'helm-find-files)
+
+#+END_SRC
+
+
+* Manage sessions
+
+Save buffer list
+
+#+BEGIN_SRC emacs-lisp 
+(desktop-save-mode 1)
+
+#+END_SRC
+
+Save cursor state
+
+#+BEGIN_SRC emacs-lisp 
+(require 'saveplace)
+(setq-default save-place t)
+
+#+END_SRC
+
+
+* Discover functions
+
+Search all interactive functions in a context
+
+#+BEGIN_SRC emacs-lisp 
+(define-key global-map (kbd "<menu>") 'helm-M-x)
+#+END_SRC
+
+
+* Search the web
+
+Google selection by =C-c / RET RET=, opens on Firefox
+
+#+BEGIN_SRC  emacs-lisp 
+(google-this-mode 1)
+
+#+END_SRC
+
+Search Wikipedia for a selection by =M-s M-w=, opens on eww
+
+#+BEGIN_SRC emacs-lisp 
+(setq eww-search-prefix "https://en.m.wikipedia.org/w/index.php?search=")
+
+#+END_SRC
+
+
+* Org mode
+
+** Headings
+
+Display heading trees like modern outlines
+
+#+BEGIN_SRC emacs-lisp 
+;; Indent headings
+(setq org-startup-indented t)
+;; Only show one bullet per heading
+(setq org-hide-leading-stars t)
+;; Show pretty bullets
+(add-hook 'org-mode-hook (lambda ()
+                           (require 'org-bullets)
+                           (org-bullets-mode 1)
+                           (setq org-bullets-bullet-list '( "·" "·" "·" "·" "·"))))
+;; Don't display any special symbol if the heading is collapsed
+(setq org-ellipsis " ")
+;; Separate collapsed headings by one line
+(setq org-cycle-separator-lines 1)
+;; Apply heading background to the whole line
+(setq org-fontify-whole-heading-line t)
+
+#+END_SRC
+
+Cycle through headings
+
+#+BEGIN_SRC emacs-lisp 
+(define-key org-mode-map [(control shift down)]  'outline-next-visible-heading)
+(define-key org-mode-map [(control shift up)]  'outline-previous-visible-heading)
+#+END_SRC
+
+Move straight to any heading or link to it
+
+#+BEGIN_SRC emacs-lisp 
+;; Link to a heading
+(defun m/orgheadinglink (marker)
+  (with-current-buffer (marker-buffer marker)
+    (let (
+          (heading-name
+           (save-excursion
+             (goto-char
+              (marker-position marker))
+             (nth 4 (org-heading-components))))
+          (file-name
+           (buffer-file-name)))
+      (with-helm-current-buffer
+        (org-insert-link
+         file-name
+         (concat "file:" file-name "::*" heading-name)
+         (concat "❇ " heading-name)))
+      )))
+;; Set actions for helm headings list
+(setq helm-org-headings-actions '(
+                                  ("Go to" . helm-org-goto-marker) ;; default go to
+                                  ("Insert link" . m/orgheadinglink) ;; available link to
+                                  ))
+;; Headings in the list are displayed along with their path 
+(setq helm-org-format-outline-path t)
+;; Key to list
+(define-key org-mode-map (kbd "C-/") 'helm-org-in-buffer-headings)
+
+#+END_SRC
+
+Make a buffer from current heading to focus
+
+#+BEGIN_SRC emacs-lisp 
+(setq org-indirect-buffer-display 'current-window)
+(defun m/orgfocus ()
+  (interactive)
+  (let ((current-prefix-arg 4))
+    (call-interactively #'org-tree-to-indirect-buffer)))
+(define-key org-mode-map (kbd "<insert>") 'm/orgfocus)
+
+#+END_SRC
+
+** Source blocks
+
+Apply a different font between text and blocks
+
+#+BEGIN_SRC emacs-lisp 
+(add-hook 'org-mode-hook (lambda ()
+                           (variable-pitch-mode)))
+
+#+END_SRC
+
+Syntax highlight and don't unnecessarily indent source blocks
+
+#+BEGIN_SRC emacs-lisp 
+(setq org-src-fontify-natively t)
+(setq-default org-edit-src-content-indentation 0)
+#+END_SRC
+
+Display pretty block begin and end lines
+
+#+BEGIN_SRC emacs-lisp 
+(setq-default prettify-symbols-alist '(
+				       ("#+TITLE:". "")
+				       (":PROPERTIES:" . ":")
+				       ("#+BEGIN_SRC" . "λ") 
+				       ("#+END_SRC" . "⋱")
+				       ("#+RESULTS:" . "»")
+				       (":END:" . "⋱")
+				       (":RESULTS:" . "⋰")
+				       ("#+NAME:" . "")
+				       ("#+BEGIN_EXAMPLE" . "~")
+				       ("#+END_EXAMPLE" . "~")
+				       ("#+TBLFM:" . "∫")
+				       ))
+(add-hook 'org-mode-hook (lambda ()
+			   (prettify-symbols-mode)))
+
+#+END_SRC
+
+Setup languages and headers for Babel
+
+#+BEGIN_SRC emacs-lisp 
+;; Languages
+(org-babel-do-load-languages
+ 'org-babel-load-languages '(
+                             (emacs-lisp . t)
+                             (shell . t)
+                             (python . t)
+                             ))
+;; Default headers
+;; Shell
+(setq org-babel-default-header-args:sh '((:results . "verbatim drawer replace")))
+;; Python
+(setq org-babel-python-command "python3")
+(setq org-babel-default-header-args:python '((:results . "verbatim drawer replace output")))
+
+#+END_SRC
+
+Create blocks by completion, edit source blocks in the same window, evaluate them without confirmation
+Block completion works by pressing =<= the template key and =TAB= 
+
+#+BEGIN_SRC emacs-lisp 
+;; Completion templates
+(setq org-structure-template-alist '(
+                                     ("n" "#+NAME: ?")
+                                     ("t" "#+TBLFM: ?")
+                                     ("s" "#+BEGIN_SRC ? \n\n#+END_SRC")
+                                     ("e" "#+BEGIN_EXAMPLE \n?\n#+END_EXAMPLE")
+                                     ("q" "#+BEGIN_QUOTE \n?\n#+END_QUOTE")
+                                     ("v" "#+BEGIN_VERSE \n?\n#+END_VERSE")
+                                     ("V" "#+BEGIN_VERBATIM \n?\n#+END_VERBATIM")
+                                     ("c" "#+BEGIN_CENTER \n?\n#+END_CENTER")
+                                     ("l" "#+BEGIN_EXPORT latex \n?\n#+END_EXPORT")
+                                     ("L" "#+LaTeX: ")
+                                     ("h" "#+BEGIN_EXPORT html \n?\n#+END_EXPORT")
+                                     ("H" "#+HTML: ")
+                                     ("a" "#+BEGIN_EXPORT ascii \n?\n#+END_EXPORT")
+                                     ("A" "#+ASCII: ")
+                                     ("i" "#+INDEX: ?")
+                                     ("I" "#+INCLUDE: %file ?")
+                                     ))
+;; Edit block in the same window
+(setq org-src-window-setup 'current-window)
+;; Evaluate without confirmation
+(setq org-confirm-babel-evaluate nil)
+;; Set header arguments inside property drawers and have these affect all nested blocks
+(setq org-use-property-inheritance t)
+
+#+END_SRC
+
+
+** Prose
+
+Simple visual and navigation tweaks
+
+#+BEGIN_SRC emacs-lisp 
+(setq org-hide-emphasis-markers t) ;; Hide markers
+(setq org-support-shift-select 'always) ;; Select with shift
+(setq org-return-follows-link t) ;; Follow links with Enter
+(setq browse-url-browser-function 'browse-url-xdg-open) ;; Open web links in Firefox
+(setq org-tags-column 0) ;; Tag positions
+
+#+END_SRC
+
+Italize easily
+
+#+BEGIN_SRC emacs-lisp 
+(defun orgitalic ()
+  (interactive)
+  (org-emphasize ?/))
+(define-key org-mode-map [(shift return)] 'orgitalic)
+
+#+END_SRC
+
+
+** Receive text from outside Emacs
+
+To receive text from Firefox I listen to messages through Emacs server and org-protocol, and process them through org-capture.
+
+Listen to messages
+
+#+BEGIN_SRC emacs-lisp 
+(server-start)
+(require 'org-protocol)
+
+#+END_SRC
+
+Put text in an ordered list inside a predefined document and heading, including its source, don't bother with editing or confirming afterwards
+
+#+BEGIN_SRC emacs-lisp 
+(defun m/capturewebclip ()
+  (let (
+        (m/clips "/home/m/auricio/write/clips/web.org")
+        )
+    (with-current-buffer (find-file-noselect m/clips)
+      (setq fragments
+            (org-map-entries
+             (lambda ()
+               (nth 4 (org-heading-components)))
+             "+fragment"
+             'file)))
+    (if (= (length fragments) 0)
+        (setq this-fragment "1")
+      (setq this-fragment (number-to-string (+ 1 (string-to-number (car (last fragments)))))))
+    (message this-fragment)
+    ))
+
+(setq org-capture-templates
+      '(("x" ;; code
+         "Web" ;; name
+         entry ;; type
+         (file+headline ;; under a heading
+          "/home/m/auricio/write/clips/web.org" ;; what file
+          "Fragments") ;; what heading
+         "\n* %(m/capturewebclip) :fragment:\n %i\n%:link" ;; what text
+         :immediate-finish t :jump-to-captured nil))) ;; don't wait for confirmation
+
+#+END_SRC
+
+I can't extend this process to taking notes from books. Books are usually distributed as PDFs and:
+1. I couldn't find a PDF reader I can have the Emacs server interact with
+2. Text from PDFs usually requires post-processing
+Therefore I decided to circunvent org-capture and just copy text with minimal automatic post-processing inside an ordered list in the current buffer.
+
+#+BEGIN_SRC emacs-lisp 
+;; Insert clipboard text inside the last heading in an ordered list, replace all line endings with spaces
+(defun m/capturepdf ()
+  (interactive)
+  (setq fragments
+        (org-map-entries
+         (lambda ()
+           (nth 4 (org-heading-components)))
+         "+fragment" 'file))
+  (if (= (length fragments) 0)
+      (setq last-fragment "1")
+    (setq last-fragment
+          (number-to-string
+           (+ 1 
+              (string-to-number
+               (car (last fragments)))))))
+  (org-insert-heading-after-current)
+  (insert last-fragment)
+  (insert
+   "\n"
+   (replace-regexp-in-string
+    "\n" " "
+    (current-kill 0)))
+  (org-set-tags-to "fragment")
+  )
+;; Key
+(define-key org-mode-map (kbd "M-v") 'frompdf)
+
+#+END_SRC
+
+
+** Find information across multiple org documents
+
+Define what documents are interesting
+
+#+BEGIN_SRC emacs-lisp 
+(setq m/interesting
+      (list
+       "/home/m/auricio/write/clips/web.org"
+       "/home/m/auricio/write/clips/1.org"
+       "/home/m/auricio/write/writing/datos.org"
+       "/home/m/auricio/write/writing/internet.org"
+       "/home/m/auricio/write/writing/socialchoice.org"
+       "/home/m/auricio/write/writing/android.org"
+       "/home/m/auricio/write/read/notes/Hofstadter_Godel-Escher-Bach.org"
+       "/home/m/auricio/write/read/notes/Osterhammel-The_Transformation_of_the_World.org"
+       "/home/m/auricio/write/read/notes/Pinker_Enlightenment_Now.org"
+       "/home/m/auricio/write/read/notes/read.org"))
+
+#+END_SRC
+
+Full text search 
+
+#+BEGIN_SRC emacs-lisp 
+;; Setup org-rifle
+(require 'helm-org-rifle)
+;; What files to search
+(defun m/riflesearch()
+  (interactive)
+  (helm-org-rifle-files m/interesting))
+;; Key to search
+(global-set-key (kbd "C-x /") 'm/riflesearch)
+
+#+END_SRC
+
+Search only headings
+
+#+BEGIN_SRC emacs-lisp 
+(setq org-agenda-files m/interesting)
+(global-set-key (kbd "C-M-/") 'helm-org-agenda-files-headings)
+
+#+END_SRC
+
+** Store and use citations
+
+Where to store citations
+
+#+BEGIN_SRC emacs-lisp 
+(require 'org-ref)
+(setq bibtex-completion-bibliography "~/auricio/write/writing/bib/ref.bib"
+      bibtex-completion-library-path "~/auricio/write/writing/bib/ref.bib"
+      bibtex-completion-notes-path "~/auricio/write/writing/bib/helm-bibtex-notes"
+      reftex-default-bibliography '("~/auricio/write/writing/bib/ref.bib")
+      org-ref-bibliography-notes "~/auricio/write/writing/bib/notes.org"
+      org-ref-default-bibliography '("~/auricio/write/writing/bib/ref.bib")
+      org-ref-pdf-directory "~/auricio/write/read/bib/")
+
+#+END_SRC
+
+Store citations with =C-c C-b= inside the Bibtex document
+Copy references to citations with =helm-bibtex=
+
+#+BEGIN_SRC emacs-lisp 
+;; Modify helm-source-bibtex so that copying references is the default option
+(setq helm-source-bibtex
+      (helm-build-sync-source "BibTeX entries"
+	:header-name (lambda (name)
+		       (format "%s%s: " name (if helm-bibtex-local-bib " (local)" "")))
+	:candidates 'helm-bibtex-candidates
+	:filtered-candidate-transformer 'helm-bibtex-candidates-formatter
+	:action (helm-make-actions
+		 "Insert reference"           'helm-bibtex-insert-reference
+		 "Open PDF, URL or DOI"       'helm-bibtex-open-any
+		 "Open URL or DOI in browser" 'helm-bibtex-open-url-or-doi
+		 "Insert citation"            'helm-bibtex-insert-citation
+		 "Insert BibTeX key"          'helm-bibtex-insert-key
+		 "Insert BibTeX entry"        'helm-bibtex-insert-bibtex
+		 "Attach PDF to email"        'helm-bibtex-add-PDF-attachment
+		 "Edit notes"                 'helm-bibtex-edit-notes
+		 "Show entry"                 'helm-bibtex-show-entry
+		 "Add PDF to library"         'helm-bibtex-add-pdf-to-library)))
+
+#+END_SRC
+
+Modify =bibtex-completion-insert-reference= so that references are not broken into multiple lines
+
+#+BEGIN_SRC emacs-lisp 
+(defun bibtex-completion-insert-reference (keys)
+  "Insert a reference for each selected entry."
+  (let* ((refs (--map
+		(concat "\n- " (bibtex-completion-apa-format-reference it))
+                keys)))
+    (insert (replace-regexp-in-string "\n" "" (s-join "" refs)))))
+
+#+END_SRC
+
+
+* Dired
+
+
+Open in current directory
+
+#+BEGIN_SRC emacs-lisp 
+(global-set-key (kbd "C-x C-d") 'dired-jump)
+#+END_SRC
+
+Display a simple list
+
+#+BEGIN_SRC emacs-lisp 
+(require 'dired-details)
+(dired-details-install)
+(setq dired-details-hidden-string "")
+
+#+END_SRC
+
+Sort directories first
+
+#+BEGIN_SRC emacs-lisp 
+(setq dired-listing-switches "-al --group-directories-first")
+
+#+END_SRC
+
+Filter list
+
+#+BEGIN_SRC  emacs-lisp 
+(define-key dired-mode-map (kbd "/") 'dired-narrow)
+
+#+END_SRC
+
+Go up and down the filesystem
+
+#+BEGIN_SRC emacs-lisp 
+(define-key dired-mode-map (kbd "M-<left>")
+  (lambda ()
+    (interactive)
+    (find-alternate-file "..")))
+(define-key dired-mode-map (kbd "M-<right>") 'dired-find-alternate-file)
+
+#+END_SRC
+
+Delete directories without confirmation
+
+#+BEGIN_SRC emacs-lisp 
+(setq dired-recursive-deletes 'always)
+
+#+END_SRC
+
+Default external applications
+
+#+BEGIN_SRC emacs-lisp 
+(require 'openwith)
+(setq openwith-associations '(
+                              ("\\.pdf\\'" "evince" (file))
+                              ("\\.jpg\\'" "feh" (file))
+                              ("\\.djvu\\'" "evince" (file))))
+(openwith-mode t)
+;; Necessary to display images in org-mode if openwith is activated
+(defadvice org-display-inline-images
+    (around handle-openwith
+            (&optional include-linked refresh beg end) activate compile)
+  (if openwith-mode
+      (progn
+        (openwith-mode -1)
+        ad-do-it
+        (openwith-mode 1))
+    ad-do-it))
+;; Open EPUBs inside Emacs
+(add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+
+#+END_SRC
+
+
+* Programming
+
+Rainbow delimiters are convenient to locate yourself inside a nested structure, I find them useful in most modes
+
+#+BEGIN_SRC emacs-lisp 
+;; What modes
+(setq m/rainbow_modes
+      (append
+       m/programming_modes
+       '(pollen-mode-hook
+         lisp-interaction-mode-hook)))
+;; Apply
+(defun m/rainbow (modes)
+  (dolist (m/mode modes)
+    (add-hook m/mode #'rainbow-delimiters-mode)))
+(m/rainbow m/rainbow_modes)
+#+END_SRC
+
+Setup auto-complete
+
+#+BEGIN_SRC emacs-lisp 
+(ac-config-default)
+(setq ac-auto-start nil)
+(define-key ac-mode-map (kbd "M-TAB") 'auto-complete)
+#+END_SRC
+
+Search all files within a directory. Press =C-c C-f= to go directly to results under the cursor (helm-follow-mode)
+
+#+BEGIN_SRC emacs-lisp :results silent
+(require 'ag)
+(global-set-key (kbd "M-.") 'helm-do-ag)
+#+END_SRC
+
+In javascript, use js2-mode with eslint if possible
+
+#+BEGIN_SRC emacs-lisp 
+;; Use js2
+(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+;; Clean display
+(setq-default js-indent-level 2)
+(setq-default js2-basic-indent 2)
+(setq-default js2-basic-offset 2)
+(setq-default js2-auto-indent-p t)
+(setq-default js2-cleanup-whitespace t)
+(setq-default js2-indent-on-enter-key t)
+(setq js2-mode-show-parse-errors nil)
+(setq js2-mode-show-strict-warnings nil)
+;; Use eslint if found in node_modules
+(defun m/js2eslint ()
+  (let* ((root (locate-dominating-file
+                (or (buffer-file-name) default-directory)
+                "node_modules"))
+         (eslint (and root
+                      (expand-file-name "node_modules/eslint/bin/eslint.js"
+                                        root))))
+    (when (and eslint (file-executable-p eslint))
+      (setq-local flycheck-javascript-eslint-executable eslint))))
+(add-hook 'flycheck-mode-hook #'m/js2eslint)
+;; Simple comments
+(defun m/js2comments ()
+  (setq comment-start "//"
+        comment-end ""
+        comment-style 'indent))
+(add-hook 'js2-mode-hook #'m/js2comments)
+
+#+END_SRC
+
+
