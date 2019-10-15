@@ -1,0 +1,1543 @@
+* Define
+
+#+BEGIN_SRC emacs-lisp 
+(deftheme personal
+  "Personal Theme")
+#+END_SRC  
+
+* Variables
+
+#+BEGIN_SRC emacs-lisp 
+(let* (
+       (tufte-font "ETBembo")
+       (code-font "Hack")
+       (charter-font "Charter")
+       (normal-font "DejaVu Sans")
+       (abril-font "Abril Fatface")
+       ;; (background-color "#f8f7fc")
+       ;; (background-color "#fefefe")
+       (background-color "#fdfcff")
+       ;; (background-color "#faf9fc")
+       ;; (current-line "#ffd8fe")
+       (current-line "#ebf7ff")
+       (foreground-color "#8f9191")
+       (textforeground "#6e677c")
+       (title-color "#000611")
+       (comment "#ffe0cf")
+       (blue "#2196f3")
+       (yellow "#ffa000")
+       (red "#ce0e0e")
+       (green "#2b9b54")
+       (purple "#512689")
+       (orange "#b7732f")
+       (spell "#ff8ef9")
+       (fui-turquoise "#1abc9c")
+       (fui-emerald "#2ecc71")
+       (fui-river "#3498db")
+       (fui-amethyst "#9b59b6")
+       (fui-deep-asphalt "#34495e")
+       (fui-asphalt "#425d78")
+       (fui-sunflower "#f1c40f")
+       (fui-carrot "#e67e22")
+       (fui-alizarin "#e74c3c")
+       (fui-clouds "#ecf0f1")
+       (fui-concrete "#95a5a6")
+       (fui-dark-turquoise "#16a085")
+       (fui-dark-emerald "#27ae60")
+       (fui-dark-river "#2980b9")
+       (fui-dark-amethyst "#8e44ad")
+       (fui-dark-asphalt "#2c3e50")
+       (fui-dark-sunflower "#f39c12")
+       (fui-dark-carrot "#d35400")
+       (fui-dark-alizarin "#c0392b")
+       (fui-dark-clouds "#bdc3c7")
+       (fui-deep-clouds "#dce0e1")
+       (fui-dark-concrete "#7f8c8d")
+       (fui-bg fui-clouds)
+       (fui-fg fui-asphalt)
+       )
+#+END_SRC
+
+
+
+* Faces
+
+Associate faces to theme
+
+#+BEGIN_SRC emacs-lisp 
+(custom-theme-set-faces
+
+ 'personal
+
+#+END_SRC
+
+
+** Basic
+
+#+BEGIN_SRC emacs-lisp 
+`(default ((t
+            (:foreground ,foreground-color :background ,background-color :height 90 :weight normal :font ,normal-font)
+            )))
+
+`(bold ((t
+         (:weight bold)
+         )))
+
+`(bold-italic ((t
+                (:weight bold :slant italic)
+                )))
+
+`(underline ((t
+              (:underline t)
+              )))
+
+`(italic ((t
+           (:slant italic)
+           )))
+
+`(shadow (
+          (t (:foreground ,comment))
+          ))
+
+`(success (
+           (t (:foreground "SeaGreen2"))
+           ))
+
+`(error (
+         (t (:weight bold :foreground ,red))
+         ))
+
+`(warning (
+           (t (:foreground ,red))
+           ))
+
+`(button ((t (:foreground "#837599" :background "#eeeafc" :underline nil))))
+
+#+END_SRC
+
+
+** Font Lock
+
+
+*** Highlight
+
+
+**** Builtins
+
+#+BEGIN_SRC emacs-lisp 
+`(font-lock-builtin-face
+  ((t
+    (:foreground "#8ec0cc")
+    )))
+#+END_SRC
+
+
+**** Constants
+
+#+BEGIN_SRC emacs-lisp 
+  `(font-lock-constant-face
+    ((t
+      (:foreground "#ef99d2")
+      )))
+#+END_SRC
+
+
+**** Documentation
+
+#+BEGIN_SRC emacs-lisp 
+  `(font-lock-doc-face
+    ((t
+      (:foreground "#85818e")
+      )))
+#+END_SRC
+
+
+**** Functions
+
+#+BEGIN_SRC emacs-lisp 
+  `(font-lock-function-name-face
+    ((t (:foreground "#9054ea")
+        )))
+#+END_SRC
+
+
+**** Variables
+
+#+BEGIN_SRC emacs-lisp 
+  `(font-lock-variable-name-face
+    ((t
+      (:foreground "#ef9bab")
+      )))
+#+END_SRC
+
+
+**** Keywords
+
+#+BEGIN_SRC emacs-lisp 
+  `(font-lock-keyword-face
+    ((t
+      (:foreground "#9d8db5")
+      )))
+#+END_SRC
+
+
+**** Negation
+
+#+BEGIN_SRC emacs-lisp 
+  `(font-lock-negation-char-face
+    ((t
+      (:foreground ,blue)
+      )))
+#+END_SRC
+
+
+**** Preprocessors
+
+#+BEGIN_SRC emacs-lisp 
+  `(font-lock-preprocessor-face
+    ((t
+      (:foreground ,yellow)
+      )))
+#+END_SRC
+
+
+**** Lisp Regexp
+
+#+BEGIN_SRC emacs-lisp 
+  `(font-lock-regexp-grouping-backslash
+    ((t
+      (:foreground ,yellow)
+      )))
+
+  `(font-lock-regexp-grouping-construct
+    ((t
+      (:foreground ,blue)
+      )))
+#+END_SRC
+
+
+**** Strings
+
+#+BEGIN_SRC emacs-lisp 
+  `(font-lock-string-face
+   ((t
+     (:foreground "#8dabdd")
+     )))
+#+END_SRC
+
+**** Types
+
+#+BEGIN_SRC emacs-lisp 
+  `(font-lock-type-face
+    ((t
+      (:foreground "#d7a2ef")
+      )))
+#+END_SRC
+
+
+**** Warnings
+
+#+BEGIN_SRC emacs-lisp 
+`(font-lock-warning-face
+  ((t
+    (:foreground "#d13434")
+    )))
+#+END_SRC
+
+
+*** Comments
+
+#+BEGIN_SRC emacs-lisp 
+`(font-lock-comment-face
+  ((t
+    (:foreground "#83ccc0")
+    )))
+#+END_SRC
+
+
+** Language-specific
+
+*** racket
+
+#+BEGIN_SRC emacs-lisp 
+`(racket-keyword-argument-face
+  ((t
+    (:foreground "#e8b78d")
+    )))
+#+END_SRC
+
+*** javascript
+
+#+BEGIN_SRC emacs-lisp 
+`(js2-external-variable
+  ((t
+    (:foreground "#e8af4e")
+    )))
+
+`(js2-function-param
+  ((t
+    (:foreground "#8fa1ba")
+    )))
+
+#+END_SRC
+
+** Window
+
+
+*** Cursor
+#+BEGIN_SRC emacs-lisp 
+`(cursor
+  ((t
+    (:background "#87767a")
+    )))
+#+END_SRC
+
+
+*** Fringe
+
+#+BEGIN_SRC emacs-lisp 
+`(fringe
+  ((t
+    (:background ,background-color)
+    )))
+
+`(vertical-border
+  ((t
+    (:background "#ffffff" :foreground "#ffffff")
+    ;; (:background "#e9e0ff" :foreground "#e9e0ff")
+    )))
+#+END_SRC
+
+
+*** Highlight
+
+#+BEGIN_SRC emacs-lisp 
+`(highlight
+  ((t
+    (:background ,current-line :inverse-video nil)
+    )))
+
+`(hl-line
+  ((t
+    (:background ,current-line :inverse-video nil)
+    )))
+#+END_SRC
+
+
+*** Mode Line
+
+#+BEGIN_SRC emacs-lisp 
+;; `(mode-line
+;;   ((t
+;;     (:weight light :background "#6d7dff":foreground "#6d7dff" :height 0.4 :box nil)
+;;     )))
+
+`(mode-line ((t (:weight light :background "#ffffff" :foreground "#ffffff" :height 1 :box nil))))
+;; `(mode-line ((t (:weight light :background "#e9e0ff" :foreground "#e9e0ff" :height 1 :box nil))))
+
+`(mode-line-buffer-id
+  ((t
+    (:foreground "#e8eaea" :background nil)
+    )))
+
+`(mode-line-inactive
+  ((t
+    (:inherit mode-line)
+    )))
+
+`(mode-line-emphasis
+  ((t
+    (:foreground ,foreground-color :slant italic)
+    )))
+
+`(mode-line-highlight
+  ((t
+    (:foreground ,blue :box nil)
+    )))
+#+END_SRC
+
+
+*** Minibuffer
+
+#+BEGIN_SRC emacs-lisp 
+`(minibuffer-prompt 
+  ((t
+    (:foreground "#572dc4" :font ,normal-font)
+    )))
+#+END_SRC
+
+
+*** Region
+
+#+BEGIN_SRC emacs-lisp 
+`(region
+  ((t
+    (:background ,"#f1f0ff")
+    )))
+#+END_SRC
+
+
+*** Secondary Selection
+
+#+BEGIN_SRC emacs-lisp 
+  `(secondary-selection
+    ((t
+      (:background "#cfc6ea" :foreground ,background-color)
+      )))
+#+END_SRC
+
+
+*** Header
+
+#+BEGIN_SRC emacs-lisp 
+`(header-line
+  ((t
+    (:font ,charter-font
+	   :background "#f4f2fa"
+	   :foreground "#857d91"
+	   :overline "#e3e1e8"
+	   :height 100
+	   :box (:line-width 7 :color "#f4f2fa"))
+    )))
+#+END_SRC
+
+
+*** Trailing Whitespace
+
+#+BEGIN_SRC emacs-lisp 
+  `(trailing-whitespace
+    ((t
+      (:background "#c4aeae")
+      )))
+#+END_SRC
+
+
+*** Helm
+
+#+BEGIN_SRC emacs-lisp 
+`(helm-header 
+  ((t
+    (:foreground "#706e73" :background "#fbfafc" :box (:line-width 7 :color "#fbfafc") )
+    )))
+
+`(helm-selection 
+  ((t
+    (:background ,current-line)
+    )))
+
+`(helm-match 
+  ((t
+    (:foreground "#501aa1" :bold nil)
+    )))
+
+`(helm-ff-file 
+  ((t
+    (:foreground "#aab7b5" )
+    )))
+
+`(helm-ff-directory 
+  ((t
+    (:foreground "#918f9b" :bold t)
+    )))
+
+`(helm-ff-executable 
+  ((t
+    (:foreground "#c69bb1" )
+    )))
+
+`(helm-grep-file 
+  ((t
+    (:foreground "#b2a6ac" :underline t )
+    )))
+
+`(helm-candidate-number 
+  ((t
+    (:foreground "#b2a6ac" :background "#f4f2f2" )
+    )))
+
+`(helm-candidate-number-suspended
+  ((t
+    (:foreground ,textforeground :background "#f4f2f2" )
+    )))
+
+`(helm-source-header 
+  ((t
+    (:font ,charter-font :background "#fbfafc" :foreground "#706e73" :bold t :height 110 :box (:line-width 6 :color "#fbfafc"))
+    )))
+
+`(helm-ff-dotted-directory ((t (:inherit helm-ff-file :foreground "#cee2df"))))
+`(helm-ff-dotted-symlink-directory ((t (:inherit helm-ff-file :foreground "#cee2df"))))
+`(helm-ff-invalid-symlink ((t (:inherit helm-ff-file :foreground "#ff8077"))))
+`(helm-ff-pipe ((t (:inherit helm-ff-file :foreground "#6d4d4b"))))
+`(helm-ff-prefix ((t (:inherit helm-ff-file :foreground "#eacd93"))))
+`(helm-ff-suid ((t (:inherit helm-ff-file :foreground "#6bea7a"))))
+`(helm-history-deleted ((t (:inherit helm-ff-invalid-symlink))))
+`(helm-M-x-key ((t (:foreground "#5bd8cc"))))
+`(helm-buffer-directory ((t (:foreground "#8083ba" ))))
+`(helm-buffer-file ((t (:foreground "#8fbab4" ))))
+`(helm-buffer-modified ((t (:foreground "#bc93c1"))))
+`(helm-buffer-not-saved ((t (:foreground "#c193a7"))))
+#+END_SRC
+
+*** Swbuff
+#+BEGIN_SRC emacs-lisp 
+`(swbuff-current-buffer-face
+  ((t
+    (:weight normal :background "#e1e1e8" :underline nil :foreground nil :font ,normal-font :box (:line-width 2 :color "#e1e1e8"))
+    )))
+
+`(swbuff-default-face
+  ((t
+    (:weight light :background "#efeff4" :foreground nil :font ,normal-font :box (:line-width 2 :color "#efeff4"))
+    )))
+
+`(swbuff-separator-face
+  ((t
+    (:background "#f2f2f7" :foreground "#efeff4")
+    )))
+#+END_SRC
+
+
+*** Search
+
+#+BEGIN_SRC emacs-lisp 
+`(match
+  ((t
+    (:background "#ECEFF1" :foreground "#F1BBB4" :weight normal :inverse-video nil)
+    )))
+
+`(isearch
+  ((t
+    (:background "#ece8ed")
+    )))
+
+`(isearch-lazy-highlight-face
+  ((t
+    (:foreground ,background-color :background ,green :inverse-video nil)
+    )))
+
+`(lazy-highlight-face
+  ((t
+    (:foreground ,background-color :background "#e5ab96" :inverse-video nil)
+    )))
+
+`(isearch-fail
+  ((t
+    (:background ,background-color :inherit font-lock-warning-face :inverse-video t)
+    )))
+
+`(ivy-current-match
+  ((t
+    (:background ,current-line)
+    )))
+
+`(ivy-minibuffer-match-face-2
+  ((t
+    (:weight normal :background "#adffe3" :foreground "#894846")
+    )))
+
+`(helm-grep-lineno
+  ((t
+    (:foreground ,purple)
+    )))
+
+`(helm-grep-match
+  ((t
+    (:foreground ,orange)
+    )))
+
+`(swiper-match-face-2
+  ((t
+    (:background "#adffe3" :foreground "#894846")
+    )))
+#+END_SRC
+
+
+
+*** Auto-dim
+
+#+BEGIN_SRC emacs-lisp 
+`(auto-dim-other-buffers-face
+  ((t
+    (:background "#f6f6f6")
+    )))
+
+#+END_SRC
+
+
+*** Flyspell
+
+#+BEGIN_SRC emacs-lisp 
+
+`(flyspell-duplicate
+  ((t
+    (:underline (:color ,spell :style wave))
+    )))
+
+`(flyspell-incorrect
+  ((t
+    (:underline (:color ,spell :style wave))
+    )))
+
+#+END_SRC
+
+** Org
+
+
+*** Format
+
+
+**** Text
+
+#+BEGIN_SRC emacs-lisp 
+  `(variable-pitch ((t
+                     (:font ,charter-font :height 100 :foreground ,textforeground :weight normal)
+                     )))
+#+END_SRC
+
+
+**** Inline Code
+
+#+BEGIN_SRC emacs-lisp 
+`(org-code
+  ((t
+    (:height 80 :background "#efeef0" :foreground "#8b888b" :font "Dejavu Sans Mono")
+    )))
+
+`(org-verbatim
+  ((t
+    (:font ,normal-font :height 80 :foreground "#919998" :background ,"#eaedec")
+    )))
+#+END_SRC
+
+
+**** Ellipsis
+
+#+BEGIN_SRC emacs-lisp 
+  `(org-ellipsis
+    ((t
+      (:foreground ,comment)
+      )))
+#+END_SRC
+
+
+**** Footnote
+
+#+BEGIN_SRC emacs-lisp 
+  `(org-footnote
+    ((t
+      (:foreground ,purple)
+      )))
+#+END_SRC
+
+
+**** Hide
+
+#+BEGIN_SRC emacs-lisp 
+`(org-hide
+  ((t
+    (:foreground ,background-color :background ,background-color)
+    )))
+#+END_SRC
+
+
+**** Link
+
+#+BEGIN_SRC emacs-lisp 
+`(org-link
+  ((t
+    (:foreground "#837599" :background "#eeeafc" :underline nil)
+    )))
+#+END_SRC
+
+
+**** Scheduling
+
+#+BEGIN_SRC emacs-lisp 
+`(org-scheduled
+  ((t
+    (:foreground ,green)
+    )))
+
+`(org-scheduled-previously
+  ((t
+    (:foreground ,orange)
+    )))
+
+`(org-scheduled-today
+  ((t
+    (:foreground ,green)
+    )))
+
+`(org-upcoming-deadline
+  ((t
+    (:foreground ,orange)
+    )))
+
+`(org-warning
+  ((t
+    (:weight normal :foreground "#f9f9f9" :background "#ffc6ba")
+    )))
+#+END_SRC
+
+
+**** Dates
+
+#+BEGIN_SRC emacs-lisp 
+  `(org-date
+    ((t
+      (:foreground ,"#80cbc4" :underline t)
+      )))
+#+END_SRC
+
+
+**** Columns
+
+#+BEGIN_SRC emacs-lisp 
+  `(org-column
+    ((t
+      (:background ,current-line)
+      )))
+
+  `(org-column-title
+    ((t
+      (:inherit org-column :weight bold :underline t)
+      )))
+#+END_SRC
+
+
+
+**** Tags
+
+#+BEGIN_SRC emacs-lisp 
+`(org-tag
+  ((t
+    (:weight light :font ,charter-font :background nil :foreground "#AEABC6" :height 90)
+    )))
+#+END_SRC
+
+
+
+**** Todo
+
+#+BEGIN_SRC emacs-lisp 
+  `(org-done
+    ((t
+      (:weight normal :background nil :foreground "#9095db")
+      )))
+
+  `(org-todo
+    ((t
+      (:background nil :weight normal :foreground "#ef9bc6")
+      )))
+#+END_SRC
+
+
+
+*** Tree
+
+#+BEGIN_SRC emacs-lisp 
+`(org-level-1
+  ((t
+    (:inherit nil :font ,charter-font :background nil :foreground "#484949" :weight normal :height 1.08)
+    )))
+
+`(org-level-2
+  ((t
+    (:inherit org-level-1)
+    )))
+
+`(org-level-3
+  ((t
+    (:inherit org-level-1 :height 0.9)
+    )))
+
+`(org-level-4
+  ((t
+    (:inherit org-level-3)
+    )))
+
+`(org-level-5
+  ((t
+    (:inherit org-level-3)
+    )))
+
+`(org-level-6
+  ((t
+    (:inherit org-level-3)
+    )))
+
+`(org-level-7
+  ((t
+    (:inherit org-level-3)
+    )))
+
+`(org-level-8
+  ((t
+    (:inherit org-level-3)
+    )))
+
+`(org-level-9
+  ((t
+    (:inherit org-level-3)
+    )))
+
+#+END_SRC
+
+*** Agenda
+#+BEGIN_SRC emacs-lisp 
+;; `(org-agenda-structure
+;;   ((t
+;;     (:foreground ,purple)
+;;     )))
+
+`(org-agenda-structure
+  ((t
+    (:foreground "#c2c6c6")
+    )))
+
+`(org-super-agenda-header
+  ((t
+    (:font ,charter-font :background "#f9f9f9" :foreground "#474343" :height 85 :box (:line-width 6 :color "#f9f9f9"))
+    )))
+
+`(org-agenda-date
+  ((t
+    (:foreground ,blue :underline nil)
+    )))
+
+`(org-agenda-done
+  ((t
+    (:foreground ,green)
+    )))
+
+`(org-agenda-dimmed-todo-face
+  ((t
+    (:foreground ,comment)
+    )))
+#+END_SRC
+
+
+*** Blocks
+
+#+BEGIN_SRC emacs-lisp 
+`(org-block
+  ((t :font "Hack"
+      :weight light
+      :foreground "#8f9191"
+      :background "#f9f7fc"
+      )))
+
+`(org-block-background ((t :font "Hack")))
+
+`(org-block-begin-line
+  ((t
+    (:weight light :foreground ,"#b8b8b8" :background ,background-color :box nil)
+    )))
+
+`(org-block-end-line
+  ((t
+    (:inherit org-block-begin-line)
+    )))
+
+
+`(org-quote
+  ((t
+    (:font ,charter-font :weight normal :slant italic :foreground "#695c89" :background ,"#f7f3ff" :box (:line-width 1 :color "#f7f3ff")))))
+
+#+END_SRC
+
+
+*** Tables
+
+#+BEGIN_SRC emacs-lisp 
+  `(org-table
+    ((t
+      (:height 70 :background "#efeef0" :foreground "#8b888b" :font "Dejavu Sans Mono")
+      )))
+
+  `(org-formula
+    ((t
+      (:foreground "#25196b" :height 70 :background "#efeef0" :font "Dejavu Sans Mono")
+      )))
+#+END_SRC
+
+
+*** Document Metadata
+
+#+BEGIN_SRC emacs-lisp 
+  `(org-document-info
+    ((t
+      (:foreground ,title-color :font ,abril-font :weight normal :height 1.2)
+      )))
+
+  `(org-document-info-keyword
+    ((t
+      (:font ,charter-font :height 90 :foreground "#b2b0b0" :weight normal)
+      )))
+
+  `(org-document-title
+    ((t
+      (:inherit org-document-info :height 1.8)
+      )))
+
+
+  `(org-meta-line
+    ((t
+      (:foreground ,"#b2b0b0" :background nil)
+      )))
+#+END_SRC
+
+
+** Markdown
+
+#+BEGIN_SRC  emacs-lisp
+`(markdown-header-face
+  ((t
+    (:inherit org-level-1)
+    )))
+
+`(markdown-header-face-1
+  ((t
+    (:inherit org-level-1)
+    )))
+
+`(markdown-header-face-2
+  ((t
+    (:inherit org-level-2)
+    )))
+
+`(markdown-header-face-3
+  ((t
+    (:inherit org-level-3)
+    )))
+
+`(markdown-header-face-4
+  ((t
+    (:inherit org-level-4)
+    )))
+
+`(markdown-header-face-5
+  ((t
+    (:inherit org-level-5)
+    )))
+
+`(markdown-header-face-6
+  ((t
+    (:inherit org-level-6)
+    )))
+
+`(markdown-inline-code-face
+	((t
+		(:inherit org-verbatim)
+		)))
+
+`(markdown-markup-face
+	((t
+		(:inherit org-meta-line)
+		)))
+
+`(markdown-blockquote-face
+	((t
+		(:inherit org-meta-line)
+		)))
+#+END_SRC
+
+** Others
+
+*** Dired
+
+#+BEGIN_SRC emacs-lisp 
+`(all-the-icons-dired-dir-face ((t (:foreground "#c2c6c6"))))
+`(dired-ignored ((t (:foreground "#d8d8d8"))))
+#+END_SRC
+
+*** Nerdtab
+
+#+BEGIN_SRC emacs-lisp 
+`(nerdtab-current-tab-face ((t (:background "#c4f4e5" :foreground "#99999b" :box (:line-width 3 :color "#c4f4e5")))))
+`(nerdtab-tab-mouse-face ((t (:inherit nerdtab-current-tab-face))))
+`(nerdtab-tab-face ((t (:foreground "#99999b" :box (:line-width 3 :color "#ededf1")))))
+`(nerdtab-special-tab-face ((t (:foreground "#c8c8cc" :box (:line-width 3 :color "#ededf1") ))))
+#+END_SRC
+
+*** Rainbow Delimiters
+#+BEGIN_SRC emacs-lisp 
+`(rainbow-delimiters-depth-1-face ((t (:foreground ,fui-fg))))
+`(rainbow-delimiters-depth-2-face ((t (:foreground ,fui-turquoise))))
+`(rainbow-delimiters-depth-3-face ((t (:foreground ,fui-dark-river))))
+`(rainbow-delimiters-depth-4-face ((t (:foreground ,fui-dark-amethyst))))
+`(rainbow-delimiters-depth-5-face ((t (:foreground ,fui-dark-sunflower))))
+`(rainbow-delimiters-depth-6-face ((t (:foreground ,fui-dark-emerald))))
+`(rainbow-delimiters-depth-7-face ((t (:foreground ,fui-dark-concrete))))
+`(rainbow-delimiters-unmatched-face ((t (:foreground ,fui-alizarin))))
+#+END_SRC
+
+
+*** Linum
+
+#+BEGIN_SRC emacs-lisp 
+  `(linum
+    ((t
+      (:foreground ,"#d1d1d1" :height 75)
+      )))
+#+END_SRC
+
+
+*** Compilation
+
+#+BEGIN_SRC emacs-lisp 
+`(compilation-column-number
+  ((t
+    (:foreground ,yellow)
+    )))
+
+`(compilation-line-number
+  ((t
+    (:foreground ,yellow)
+    )))
+
+`(compilation-message-face
+  ((t
+    (:foreground ,blue)
+    )))
+
+`(compilation-mode-line-exit
+  ((t
+    (:foreground ,green)
+    )))
+
+`(compilation-mode-line-fail
+  ((t
+    (:foreground ,red)
+    )))
+
+`(compilation-mode-line-run
+  ((t
+    (:foreground ,blue)
+    )))
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp 
+;; `(Man-overstrike ((t (:font ,normal-font))))
+;; `(Man-reverse ((t (:font ,normal-font))))
+;; `(Man-underline ((t (:font ,normal-font))))
+;; ;; ;; `(ac-candidate-face ((t (:font ,normal-font))))
+;; ;; ;; `(ac-candidate-mouse-face ((t (:font ,normal-font))))
+;; ;; ;; `(ac-completion-face ((t (:font ,normal-font))))
+;; ;; ;; `(ac-gtags-candidate-face ((t (:font ,normal-font))))
+;; ;; ;; `(ac-gtags-selection-face ((t (:font ,normal-font))))
+;; ;; ;; `(ac-selection-face ((t (:font ,normal-font))))
+;; ;; ;; `(ac-yasnippet-candidate-face ((t (:font ,normal-font))))
+;; ;; ;; `(ac-yasnippet-selection-face ((t (:font ,normal-font))))
+;; ;; ;; `(ag-hit-face ((t (:font ,normal-font))))
+;; ;; ;; `(ag-match-face ((t (:font ,normal-font))))
+;; ;; ;; `(biblio-detail-header-face ((t (:font ,normal-font))))
+;; ;; ;; `(biblio-results-header-face ((t (:font ,normal-font))))
+;; ;; ;; `(bold ((t (:font ,normal-font))))
+;; ;; ;; `(bold-italic ((t (:font ,normal-font))))
+;; `(bookmark-menu-bookmark ((t (:font ,normal-font))))
+;; `(bookmark-menu-heading ((t (:font ,normal-font))))
+;; ;; `(border ((t (:font ,normal-font))))
+;; ;; `(buffer-menu-buffer ((t (:font ,normal-font))))
+;; ;; `(button ((t (:font ,normal-font))))
+;; ;; ;; `(c-annotation-face ((t (:font ,normal-font))))
+;; ;; ;; `(c-nonbreakable-space-face ((t (:font ,normal-font))))
+;; ;; `(calc-nonselected-face ((t (:font ,normal-font))))
+;; ;; `(calc-selected-face ((t (:font ,normal-font))))
+;; ;; `(calendar-month-header ((t (:font ,normal-font))))
+;; ;; `(calendar-today ((t (:font ,normal-font))))
+;; ;; `(calendar-weekday-header ((t (:font ,normal-font))))
+;; ;; `(calendar-weekend-header ((t (:font ,normal-font))))
+;; ;; `(change-log-acknowledgment ((t (:font ,normal-font))))
+;; ;; `(change-log-conditionals ((t (:font ,normal-font))))
+;; ;; `(change-log-date ((t (:font ,normal-font))))
+;; ;; `(change-log-email ((t (:font ,normal-font))))
+;; ;; `(change-log-file ((t (:font ,normal-font))))
+;; ;; `(change-log-function ((t (:font ,normal-font))))
+;; ;; `(change-log-list ((t (:font ,normal-font))))
+;; ;; `(change-log-name ((t (:font ,normal-font))))
+;; ;; `(comint-highlight-input ((t (:font ,normal-font))))
+;; ;; `(comint-highlight-prompt ((t (:font ,normal-font))))
+;; ;; `(compilation-column-number ((t (:font ,normal-font))))
+;; ;; `(compilation-error ((t (:font ,normal-font))))
+;; ;; `(compilation-info ((t (:font ,normal-font))))
+;; ;; `(compilation-line-number ((t (:font ,normal-font))))
+;; ;; `(compilation-mode-line-exit ((t (:font ,normal-font))))
+;; ;; `(compilation-mode-line-fail ((t (:font ,normal-font))))
+;; ;; `(compilation-mode-line-run ((t (:font ,normal-font))))
+;; ;; `(compilation-warning ((t (:font ,normal-font))))
+;; ;; `(completions-annotations ((t (:font ,normal-font))))
+;; ;; `(completions-common-part ((t (:font ,normal-font))))
+;; ;; `(completions-first-difference ((t (:font ,normal-font))))
+;; ;; `(css-property ((t (:font ,normal-font))))
+;; ;; `(css-proprietary-property ((t (:font ,normal-font))))
+;; ;; `(css-selector ((t (:font ,normal-font))))
+;; ;; `(cursor ((t (:font ,normal-font))))
+;; ;; `(custom-button ((t (:font ,normal-font))))
+;; ;; `(custom-button-mouse ((t (:font ,normal-font))))
+;; ;; `(custom-button-pressed ((t (:font ,normal-font))))
+;; ;; `(custom-button-pressed-unraised ((t (:font ,normal-font))))
+;; ;; `(custom-button-unraised ((t (:font ,normal-font))))
+;; ;; `(custom-changed ((t (:font ,normal-font))))
+;; ;; `(custom-comment ((t (:font ,normal-font))))
+;; ;; `(custom-comment-tag ((t (:font ,normal-font))))
+;; ;; `(custom-documentation ((t (:font ,normal-font))))
+;; ;; `(custom-face-tag ((t (:font ,normal-font))))
+;; ;; `(custom-group-subtitle ((t (:font ,normal-font))))
+;; ;; `(custom-group-tag ((t (:font ,normal-font))))
+;; ;; `(custom-group-tag-1 ((t (:font ,normal-font))))
+;; ;; `(custom-invalid ((t (:font ,normal-font))))
+;; ;; `(custom-link ((t (:font ,normal-font))))
+;; ;; `(custom-modified ((t (:font ,normal-font))))
+;; ;; `(custom-rogue ((t (:font ,normal-font))))
+;; ;; `(custom-saved ((t (:font ,normal-font))))
+;; ;; `(custom-set ((t (:font ,normal-font))))
+;; ;; `(custom-state ((t (:font ,normal-font))))
+;; ;; `(custom-themed ((t (:font ,normal-font))))
+;; ;; `(custom-variable-button ((t (:font ,normal-font))))
+;; ;; `(custom-variable-tag ((t (:font ,normal-font))))
+;; ;; `(custom-visibility ((t (:font ,normal-font))))
+;; ;; `(default ((t (:font ,normal-font))))
+;; ;; `(diary ((t (:font ,normal-font))))
+;; ;; ;; `(diff-added ((t (:font ,normal-font))))
+;; ;; ;; `(diff-changed ((t (:font ,normal-font))))
+;; ;; ;; `(diff-context ((t (:font ,normal-font))))
+;; ;; ;; `(diff-file-header ((t (:font ,normal-font))))
+;; ;; ;; `(diff-function ((t (:font ,normal-font))))
+;; ;; ;; `(diff-header ((t (:font ,normal-font))))
+;; ;; ;; `(diff-hunk-header ((t (:font ,normal-font))))
+;; ;; ;; `(diff-index ((t (:font ,normal-font))))
+;; ;; ;; `(diff-indicator-added ((t (:font ,normal-font))))
+;; ;; ;; `(diff-indicator-changed ((t (:font ,normal-font))))
+;; ;; ;; `(diff-indicator-removed ((t (:font ,normal-font))))
+;; ;; ;; `(diff-nonexistent ((t (:font ,normal-font))))
+;; ;; ;; `(diff-refine-added ((t (:font ,normal-font))))
+;; ;; ;; `(diff-refine-changed ((t (:font ,normal-font))))
+;; ;; ;; `(diff-refine-removed ((t (:font ,normal-font))))
+;; ;; ;; `(diff-removed ((t (:font ,normal-font))))
+;; `(dired-directory ((t (:font ,normal-font))))
+;; `(dired-flagged ((t (:font ,normal-font))))
+;; `(dired-header ((t (:font ,normal-font))))
+;; `(dired-ignored ((t (:font ,normal-font))))
+;; `(dired-mark ((t (:font ,normal-font))))
+;; `(dired-marked ((t (:font ,normal-font))))
+;; `(dired-narrow-blink ((t (:font ,normal-font))))
+;; `(dired-perm-write ((t (:font ,normal-font))))
+;; `(dired-symlink ((t (:font ,normal-font))))
+;; `(dired-warning ((t (:font ,normal-font))))
+;; ;; `(eldoc-highlight-function-argument ((t (:font ,normal-font))))
+;; ;; `(error ((t (:font ,normal-font))))
+;; ;; `(escape-glyph ((t (:font ,normal-font))))
+;; ;; `(ffap ((t (:font ,normal-font))))
+;; ;; `(file-name-shadow ((t (:font ,normal-font))))
+;; ;; `(fixed-pitch ((t (:font ,normal-font))))
+;; ;; `(fixed-pitch-serif ((t (:font ,normal-font))))
+;; ;; `(flymake-errline ((t (:font ,normal-font))))
+;; ;; `(flymake-warnline ((t (:font ,normal-font))))
+;; ;; `(glyphless-char ((t (:font ,normal-font))))
+;; ;; `(gnus-group-mail-1 ((t (:font ,normal-font))))
+;; ;; `(gnus-group-mail-1-empty ((t (:font ,normal-font))))
+;; ;; `(gnus-group-mail-2 ((t (:font ,normal-font))))
+;; ;; `(gnus-group-mail-2-empty ((t (:font ,normal-font))))
+;; ;; `(gnus-group-mail-3 ((t (:font ,normal-font))))
+;; ;; `(gnus-group-mail-3-empty ((t (:font ,normal-font))))
+;; ;; `(gnus-group-mail-low ((t (:font ,normal-font))))
+;; ;; `(gnus-group-mail-low-empty ((t (:font ,normal-font))))
+;; ;; `(gnus-group-news-1 ((t (:font ,normal-font))))
+;; ;; `(gnus-group-news-1-empty ((t (:font ,normal-font))))
+;; ;; `(gnus-group-news-2 ((t (:font ,normal-font))))
+;; ;; `(gnus-group-news-2-empty ((t (:font ,normal-font))))
+;; ;; `(gnus-group-news-3 ((t (:font ,normal-font))))
+;; ;; `(gnus-group-news-3-empty ((t (:font ,normal-font))))
+;; ;; `(gnus-group-news-4 ((t (:font ,normal-font))))
+;; ;; `(gnus-group-news-4-empty ((t (:font ,normal-font))))
+;; ;; `(gnus-group-news-5 ((t (:font ,normal-font))))
+;; ;; `(gnus-group-news-5-empty ((t (:font ,normal-font))))
+;; ;; `(gnus-group-news-6 ((t (:font ,normal-font))))
+;; ;; `(gnus-group-news-6-empty ((t (:font ,normal-font))))
+;; ;; `(gnus-group-news-low ((t (:font ,normal-font))))
+;; ;; `(gnus-group-news-low-empty ((t (:font ,normal-font))))
+;; ;; `(gnus-splash ((t (:font ,normal-font))))
+;; ;; `(gnus-summary-cancelled ((t (:font ,normal-font))))
+;; ;; `(gnus-summary-high-ancient ((t (:font ,normal-font))))
+;; ;; `(gnus-summary-high-read ((t (:font ,normal-font))))
+;; ;; `(gnus-summary-high-ticked ((t (:font ,normal-font))))
+;; ;; `(gnus-summary-high-undownloaded ((t (:font ,normal-font))))
+;; ;; `(gnus-summary-high-unread ((t (:font ,normal-font))))
+;; ;; `(gnus-summary-low-ancient ((t (:font ,normal-font))))
+;; ;; `(gnus-summary-low-read ((t (:font ,normal-font))))
+;; ;; `(gnus-summary-low-ticked ((t (:font ,normal-font))))
+;; ;; `(gnus-summary-low-undownloaded ((t (:font ,normal-font))))
+;; ;; `(gnus-summary-low-unread ((t (:font ,normal-font))))
+;; ;; `(gnus-summary-normal-ancient ((t (:font ,normal-font))))
+;; ;; `(gnus-summary-normal-read ((t (:font ,normal-font))))
+;; ;; `(gnus-summary-normal-ticked ((t (:font ,normal-font))))
+;; ;; `(gnus-summary-normal-undownloaded ((t (:font ,normal-font))))
+;; ;; `(gnus-summary-normal-unread ((t (:font ,normal-font))))
+;; ;; `(gnus-summary-selected ((t (:font ,normal-font))))
+;; ;; `(header-line ((t (:font ,normal-font))))
+;; `(helm-M-x-key ((t (:font ,normal-font))))
+;; `(helm-action ((t (:font ,normal-font))))
+;; `(helm-bookmark-addressbook ((t (:font ,normal-font))))
+;; `(helm-bookmark-directory ((t (:font ,normal-font))))
+;; `(helm-bookmark-file ((t (:font ,normal-font))))
+;; `(helm-bookmark-file-not-found ((t (:font ,normal-font))))
+;; `(helm-bookmark-gnus ((t (:font ,normal-font))))
+;; `(helm-bookmark-info ((t (:font ,normal-font))))
+;; `(helm-bookmark-man ((t (:font ,normal-font))))
+;; `(helm-bookmark-w3m ((t (:font ,normal-font))))
+;; `(helm-buffer-archive ((t (:font ,normal-font))))
+;; `(helm-buffer-directory ((t (:font ,normal-font))))
+;; `(helm-buffer-file ((t (:font ,normal-font))))
+;; `(helm-buffer-modified ((t (:font ,normal-font))))
+;; `(helm-buffer-not-saved ((t (:font ,normal-font))))
+;; `(helm-buffer-process ((t (:font ,normal-font))))
+;; `(helm-buffer-saved-out ((t (:font ,normal-font))))
+;; `(helm-buffer-size ((t (:font ,normal-font))))
+;; `(helm-candidate-number ((t (:font ,normal-font))))
+;; `(helm-candidate-number-suspended ((t (:font ,normal-font))))
+;; `(helm-etags-file ((t (:font ,normal-font))))
+;; `(helm-ff-directory ((t (:font ,normal-font))))
+;; `(helm-ff-dirs ((t (:font ,normal-font))))
+;; `(helm-ff-dotted-directory ((t (:font ,normal-font))))
+;; `(helm-ff-dotted-symlink-directory ((t (:font ,normal-font))))
+;; `(helm-ff-executable ((t (:font ,normal-font))))
+;; `(helm-ff-file ((t (:font ,normal-font))))
+;; `(helm-ff-invalid-symlink ((t (:font ,normal-font))))
+;; `(helm-ff-prefix ((t (:font ,normal-font))))
+;; `(helm-ff-symlink ((t (:font ,normal-font))))
+;; `(helm-grep-cmd-line ((t (:font ,normal-font))))
+;; `(helm-grep-file ((t (:font ,normal-font))))
+;; `(helm-grep-finish ((t (:font ,normal-font))))
+;; `(helm-grep-lineno ((t (:font ,normal-font))))
+;; `(helm-grep-match ((t (:font ,normal-font))))
+;; `(helm-header ((t (:font ,normal-font))))
+;; `(helm-header-line-left-margin ((t (:font ,normal-font))))
+;; `(helm-helper ((t (:font ,normal-font))))
+;; `(helm-history-deleted ((t (:font ,normal-font))))
+;; `(helm-history-remote ((t (:font ,normal-font))))
+;; `(helm-lisp-completion-info ((t (:font ,normal-font))))
+;; `(helm-lisp-show-completion ((t (:font ,normal-font))))
+;; `(helm-locate-finish ((t (:font ,normal-font))))
+;; `(helm-match ((t (:font ,normal-font))))
+;; `(helm-match-item ((t (:font ,normal-font))))
+;; `(helm-moccur-buffer ((t (:font ,normal-font))))
+;; `(helm-non-file-buffer ((t (:font ,normal-font))))
+;; `(helm-org-rifle-separator ((t (:font ,normal-font))))
+;; `(helm-prefarg ((t (:font ,normal-font))))
+;; `(helm-resume-need-update ((t (:font ,normal-font))))
+;; `(helm-selection ((t (:font ,normal-font))))
+;; `(helm-selection-line ((t (:font ,normal-font))))
+;; `(helm-separator ((t (:font ,normal-font))))
+;; `(helm-source-header ((t (:font ,normal-font))))
+;; `(helm-visible-mark ((t (:font ,normal-font))))
+;; ;; `(help-argument-name ((t (:font ,normal-font))))
+;; ;; `(highlight ((t (:font ,normal-font))))
+;; ;; `(hl-line ((t (:font ,normal-font))))
+;; ;; `(holiday ((t (:font ,normal-font))))
+;; ;; `(hydra-face-amaranth ((t (:font ,normal-font))))
+;; ;; `(hydra-face-blue ((t (:font ,normal-font))))
+;; ;; `(hydra-face-pink ((t (:font ,normal-font))))
+;; ;; `(hydra-face-red ((t (:font ,normal-font))))
+;; ;; `(hydra-face-teal ((t (:font ,normal-font))))
+;; `(ido-first-match ((t (:font ,normal-font))))
+;; `(ido-incomplete-regexp ((t (:font ,normal-font))))
+;; `(ido-indicator ((t (:font ,normal-font))))
+;; `(ido-only-match ((t (:font ,normal-font))))
+;; `(ido-subdir ((t (:font ,normal-font))))
+;; `(ido-virtual ((t (:font ,normal-font))))
+;; `(info-header-node ((t (:font ,normal-font))))
+;; `(info-header-xref ((t (:font ,normal-font))))
+;; `(info-index-match ((t (:font ,normal-font))))
+;; `(info-menu-header ((t (:font ,normal-font))))
+;; `(info-menu-star ((t (:font ,normal-font))))
+;; `(info-node ((t (:font ,normal-font))))
+;; `(info-title-1 ((t (:font ,normal-font))))
+;; `(info-title-2 ((t (:font ,normal-font))))
+;; `(info-title-3 ((t (:font ,normal-font))))
+;; `(info-title-4 ((t (:font ,normal-font))))
+;; `(info-xref ((t (:font ,normal-font))))
+;; `(info-xref-visited ((t (:font ,normal-font))))
+;; `(isearch ((t (:font ,normal-font))))
+;; `(isearch-fail ((t (:font ,normal-font))))
+;; ;; `(italic ((t (:font ,normal-font))))
+;; `(ivy-action ((t (:font ,normal-font))))
+;; `(ivy-confirm-face ((t (:font ,normal-font))))
+;; `(ivy-current-match ((t (:font ,normal-font))))
+;; `(ivy-cursor ((t (:font ,normal-font))))
+;; `(ivy-highlight-face ((t (:font ,normal-font))))
+;; `(ivy-match-required-face ((t (:font ,normal-font))))
+;; `(ivy-minibuffer-match-face-1 ((t (:font ,normal-font))))
+;; `(ivy-minibuffer-match-face-2 ((t (:font ,normal-font))))
+;; `(ivy-minibuffer-match-face-3 ((t (:font ,normal-font))))
+;; `(ivy-minibuffer-match-face-4 ((t (:font ,normal-font))))
+;; `(ivy-minibuffer-match-highlight ((t (:font ,normal-font))))
+;; `(ivy-modified-buffer ((t (:font ,normal-font))))
+;; `(ivy-prompt-match ((t (:font ,normal-font))))
+;; `(ivy-remote ((t (:font ,normal-font))))
+;; `(ivy-subdir ((t (:font ,normal-font))))
+;; `(ivy-virtual ((t (:font ,normal-font))))
+;; ;; `(js2-error ((t (:font ,normal-font))))
+;; ;; `(js2-external-variable ((t (:font ,normal-font))))
+;; ;; `(js2-function-call ((t (:font ,normal-font))))
+;; ;; `(js2-function-param ((t (:font ,normal-font))))
+;; ;; `(js2-instance-member ((t (:font ,normal-font))))
+;; ;; `(js2-jsdoc-html-tag-delimiter ((t (:font ,normal-font))))
+;; ;; `(js2-jsdoc-html-tag-name ((t (:font ,normal-font))))
+;; ;; `(js2-jsdoc-tag ((t (:font ,normal-font))))
+;; ;; `(js2-jsdoc-type ((t (:font ,normal-font))))
+;; ;; `(js2-jsdoc-value ((t (:font ,normal-font))))
+;; ;; `(js2-object-property ((t (:font ,normal-font))))
+;; ;; `(js2-object-property-access ((t (:font ,normal-font))))
+;; ;; `(js2-private-function-call ((t (:font ,normal-font))))
+;; ;; `(js2-private-member ((t (:font ,normal-font))))
+;; ;; `(js2-warning ((t (:font ,normal-font))))
+;; ;; `(lazy-highlight ((t (:font ,normal-font))))
+;; ;; `(link ((t (:font ,normal-font))))
+;; ;; `(link-visited ((t (:font ,normal-font))))
+;; ;; `(linum ((t (:font ,normal-font))))
+;; ;; `(lv-separator ((t (:font ,normal-font))))
+;; ;; `(match ((t (:font ,normal-font))))
+;; ;; `(menu ((t (:font ,normal-font))))
+;; ;; `(message-cited-text ((t (:font ,normal-font))))
+;; ;; `(message-header-cc ((t (:font ,normal-font))))
+;; ;; `(message-header-name ((t (:font ,normal-font))))
+;; ;; `(message-header-newsgroups ((t (:font ,normal-font))))
+;; ;; `(message-header-other ((t (:font ,normal-font))))
+;; ;; `(message-header-subject ((t (:font ,normal-font))))
+;; ;; `(message-header-to ((t (:font ,normal-font))))
+;; ;; `(message-header-xheader ((t (:font ,normal-font))))
+;; ;; `(message-mml ((t (:font ,normal-font))))
+;; ;; `(message-separator ((t (:font ,normal-font))))
+;; ;; `(minibuffer-prompt ((t (:font ,normal-font))))
+;; ;; `(mm-command-output ((t (:font ,normal-font))))
+;; ;; `(mode-line ((t (:font ,normal-font))))
+;; ;; `(mode-line-buffer-id ((t (:font ,normal-font))))
+;; ;; `(mode-line-emphasis ((t (:font ,normal-font))))
+;; ;; `(mode-line-highlight ((t (:font ,normal-font))))
+;; ;; `(mode-line-inactive ((t (:font ,normal-font))))
+;; ;; `(mouse ((t (:font ,normal-font))))
+;; ;; `(next-error ((t (:font ,normal-font))))
+;; ;; `(nobreak-space ((t (:font ,normal-font))))
+;; ;; `(org-agenda-calendar-event ((t (:font ,normal-font))))
+;; ;; `(org-agenda-calendar-sexp ((t (:font ,normal-font))))
+;; ;; `(org-agenda-clocking ((t (:font ,normal-font))))
+;; ;; `(org-agenda-column-dateline ((t (:font ,normal-font))))
+;; ;; `(org-agenda-current-time ((t (:font ,normal-font))))
+;; ;; `(org-agenda-date ((t (:font ,normal-font))))
+;; ;; `(org-agenda-date-today ((t (:font ,normal-font))))
+;; ;; `(org-agenda-date-weekend ((t (:font ,normal-font))))
+;; ;; `(org-agenda-diary ((t (:font ,normal-font))))
+;; ;; `(org-agenda-dimmed-todo-face ((t (:font ,normal-font))))
+;; ;; `(org-agenda-done ((t (:font ,normal-font))))
+;; ;; `(org-agenda-filter-category ((t (:font ,normal-font))))
+;; ;; `(org-agenda-filter-effort ((t (:font ,normal-font))))
+;; ;; `(org-agenda-filter-regexp ((t (:font ,normal-font))))
+;; ;; `(org-agenda-filter-tags ((t (:font ,normal-font))))
+;; ;; `(org-agenda-restriction-lock ((t (:font ,normal-font))))
+;; ;; `(org-agenda-structure ((t (:font ,normal-font))))
+;; ;; `(org-archived ((t (:font ,normal-font))))
+;; ;; `(org-block-begin-line ((t (:font ,normal-font))))
+;; ;; `(org-block-end-line ((t (:font ,normal-font))))
+;; ;; `(org-checkbox ((t (:font ,normal-font))))
+;; ;; `(org-checkbox-statistics-done ((t (:font ,normal-font))))
+;; ;; `(org-checkbox-statistics-todo ((t (:font ,normal-font))))
+;; ;; `(org-clock-overlay ((t (:font ,normal-font))))
+;; ;; `(org-column ((t (:font ,normal-font))))
+;; ;; `(org-column-title ((t (:font ,normal-font))))
+;; ;; `(org-date ((t (:font ,normal-font))))
+;; ;; `(org-date-selected ((t (:font ,normal-font))))
+;; `(org-default ((t (:font ,normal-font))))
+;; `(org-document-info ((t (:font ,normal-font))))
+;; `(org-document-info-keyword ((t (:font ,normal-font))))
+;; `(org-document-title ((t (:font ,normal-font))))
+;; `(org-done ((t (:font ,normal-font))))
+;; ;; `(org-drawer ((t (:font ,normal-font))))
+;; ;; `(org-ellipsis ((t (:font ,normal-font))))
+;; ;; `(org-footnote ((t (:font ,normal-font))))
+;; ;; `(org-formula ((t (:font ,normal-font))))
+;; ;; `(org-headline-done ((t (:font ,normal-font))))
+;; ;; `(org-hide ((t (:font ,normal-font))))
+;; ;; `(org-indent ((t (:font ,normal-font))))
+;; ;; `(org-latex-and-related ((t (:font ,normal-font))))
+;; ;; `(org-level-1 ((t (:font ,normal-font))))
+;; ;; `(org-level-2 ((t (:font ,normal-font))))
+;; ;; `(org-level-3 ((t (:font ,normal-font))))
+;; ;; `(org-level-4 ((t (:font ,normal-font))))
+;; ;; `(org-level-5 ((t (:font ,normal-font))))
+;; ;; `(org-level-6 ((t (:font ,normal-font))))
+;; ;; `(org-level-7 ((t (:font ,normal-font))))
+;; ;; `(org-level-8 ((t (:font ,normal-font))))
+;; ;; `(org-link ((t (:font ,normal-font))))
+;; ;; `(org-list-dt ((t (:font ,normal-font))))
+;; ;; `(org-macro ((t (:font ,normal-font))))
+;; ;; `(org-meta-line ((t (:font ,normal-font))))
+;; ;; `(org-mode-line-clock ((t (:font ,normal-font))))
+;; ;; `(org-mode-line-clock-overrun ((t (:font ,normal-font))))
+;; ;; `(org-priority ((t (:font ,normal-font))))
+;; ;; `(org-property-value ((t (:font ,normal-font))))
+;; ;; `(org-ref-acronym-face ((t (:font ,normal-font))))
+;; ;; `(org-ref-cite-face ((t (:font ,normal-font))))
+;; ;; `(org-ref-glossary-face ((t (:font ,normal-font))))
+;; ;; `(org-ref-label-face ((t (:font ,normal-font))))
+;; ;; `(org-ref-ref-face ((t (:font ,normal-font))))
+;; ;; `(org-scheduled ((t (:font ,normal-font))))
+;; ;; `(org-scheduled-previously ((t (:font ,normal-font))))
+;; ;; `(org-scheduled-today ((t (:font ,normal-font))))
+;; ;; `(org-sexp-date ((t (:font ,normal-font))))
+;; ;; `(org-special-keyword ((t (:font ,normal-font))))
+;; ;; `(org-table ((t (:font ,normal-font))))
+;; ;; `(org-tag ((t (:font ,normal-font))))
+;; ;; `(org-tag-group ((t (:font ,normal-font))))
+;; ;; `(org-target ((t (:font ,normal-font))))
+;; ;; `(org-time-grid ((t (:font ,normal-font))))
+;; ;; `(org-todo ((t (:font ,normal-font))))
+;; ;; `(org-upcoming-deadline ((t (:font ,normal-font))))
+;; ;; `(org-verbatim ((t (:font ,normal-font))))
+;; ;; `(org-verse ((t (:font ,normal-font))))
+;; ;; `(org-warning ((t (:font ,normal-font))))
+;; ;; `(outline-1 ((t (:font ,normal-font))))
+;; ;; `(outline-2 ((t (:font ,normal-font))))
+;; ;; `(outline-3 ((t (:font ,normal-font))))
+;; ;; `(outline-4 ((t (:font ,normal-font))))
+;; ;; `(outline-5 ((t (:font ,normal-font))))
+;; ;; `(outline-6 ((t (:font ,normal-font))))
+;; ;; `(outline-7 ((t (:font ,normal-font))))
+;; ;; `(outline-8 ((t (:font ,normal-font))))
+;; ;; `(package-description ((t (:font ,normal-font))))
+;; ;; `(package-help-section-name ((t (:font ,normal-font))))
+;; ;; `(package-name ((t (:font ,normal-font))))
+;; ;; `(package-status-avail-obso ((t (:font ,normal-font))))
+;; ;; `(package-status-available ((t (:font ,normal-font))))
+;; ;; `(package-status-built-in ((t (:font ,normal-font))))
+;; ;; `(package-status-dependency ((t (:font ,normal-font))))
+;; ;; `(package-status-disabled ((t (:font ,normal-font))))
+;; ;; `(package-status-external ((t (:font ,normal-font))))
+;; ;; `(package-status-held ((t (:font ,normal-font))))
+;; ;; `(package-status-incompat ((t (:font ,normal-font))))
+;; ;; `(package-status-installed ((t (:font ,normal-font))))
+;; ;; `(package-status-new ((t (:font ,normal-font))))
+;; ;; `(package-status-unsigned ((t (:font ,normal-font))))
+;; ;; `(pdf-view-rectangle ((t (:font ,normal-font))))
+;; ;; `(pdf-view-region ((t (:font ,normal-font))))
+;; ;; `(php-$this ((t (:font ,normal-font))))
+;; ;; `(php-$this-sigil ((t (:font ,normal-font))))
+;; ;; `(php-builtin ((t (:font ,normal-font))))
+;; ;; `(php-constant ((t (:font ,normal-font))))
+;; ;; `(php-doc-$this ((t (:font ,normal-font))))
+;; ;; `(php-doc-$this-sigil ((t (:font ,normal-font))))
+;; ;; `(php-doc-annotation-tag ((t (:font ,normal-font))))
+;; ;; `(php-doc-class-name ((t (:font ,normal-font))))
+;; ;; `(php-doc-variable-sigil ((t (:font ,normal-font))))
+;; ;; `(php-function-call ((t (:font ,normal-font))))
+;; ;; `(php-function-name ((t (:font ,normal-font))))
+;; ;; `(php-keyword ((t (:font ,normal-font))))
+;; ;; `(php-method-call ((t (:font ,normal-font))))
+;; ;; `(php-object-op ((t (:font ,normal-font))))
+;; ;; `(php-paamayim-nekudotayim ((t (:font ,normal-font))))
+;; ;; `(php-php-tag ((t (:font ,normal-font))))
+;; ;; `(php-property-name ((t (:font ,normal-font))))
+;; ;; `(php-static-method-call ((t (:font ,normal-font))))
+;; ;; `(php-string ((t (:font ,normal-font))))
+;; ;; `(php-type ((t (:font ,normal-font))))
+;; ;; `(php-variable-name ((t (:font ,normal-font))))
+;; ;; `(php-variable-sigil ((t (:font ,normal-font))))
+;; ;; `(popup-face ((t (:font ,normal-font))))
+;; ;; `(popup-isearch-match ((t (:font ,normal-font))))
+;; ;; `(popup-menu-face ((t (:font ,normal-font))))
+;; ;; `(popup-menu-mouse-face ((t (:font ,normal-font))))
+;; ;; `(popup-menu-selection-face ((t (:font ,normal-font))))
+;; ;; `(popup-menu-summary-face ((t (:font ,normal-font))))
+;; ;; `(popup-scroll-bar-background-face ((t (:font ,normal-font))))
+;; ;; `(popup-scroll-bar-foreground-face ((t (:font ,normal-font))))
+;; ;; `(popup-summary-face ((t (:font ,normal-font))))
+;; ;; `(popup-tip-face ((t (:font ,normal-font))))
+;; ;; `(query-replace ((t (:font ,normal-font))))
+;; ;; `(rainbow-delimiters-base-face ((t (:font ,normal-font))))
+;; ;; `(rainbow-delimiters-depth-1-face ((t (:font ,normal-font))))
+;; ;; `(rainbow-delimiters-depth-2-face ((t (:font ,normal-font))))
+;; ;; `(rainbow-delimiters-depth-3-face ((t (:font ,normal-font))))
+;; ;; `(rainbow-delimiters-depth-4-face ((t (:font ,normal-font))))
+;; ;; `(rainbow-delimiters-depth-5-face ((t (:font ,normal-font))))
+;; ;; `(rainbow-delimiters-depth-6-face ((t (:font ,normal-font))))
+;; ;; `(rainbow-delimiters-depth-7-face ((t (:font ,normal-font))))
+;; ;; `(rainbow-delimiters-depth-8-face ((t (:font ,normal-font))))
+;; ;; `(rainbow-delimiters-depth-9-face ((t (:font ,normal-font))))
+;; ;; `(rainbow-delimiters-mismatched-face ((t (:font ,normal-font))))
+;; ;; `(rainbow-delimiters-unmatched-face ((t (:font ,normal-font))))
+;; ;; `(rectangle-preview ((t (:font ,normal-font))))
+;; ;; `(region ((t (:font ,normal-font))))
+;; ;; `(scroll-bar ((t (:font ,normal-font))))
+;; ;; `(secondary-selection ((t (:font ,normal-font))))
+;; ;; `(sgml-namespace ((t (:font ,normal-font))))
+;; ;; `(sh-escaped-newline ((t (:font ,normal-font))))
+;; ;; `(sh-heredoc ((t (:font ,normal-font))))
+;; ;; `(sh-quoted-exec ((t (:font ,normal-font))))
+;; ;; `(shadow ((t (:font ,normal-font))))
+;; ;; `(show-paren-match ((t (:font ,normal-font))))
+;; ;; `(show-paren-mismatch ((t (:font ,normal-font))))
+;; ;; `(speedbar-button-face ((t (:font ,normal-font))))
+;; ;; `(speedbar-directory-face ((t (:font ,normal-font))))
+;; ;; `(speedbar-file-face ((t (:font ,normal-font))))
+;; ;; `(speedbar-highlight-face ((t (:font ,normal-font))))
+;; ;; `(speedbar-selected-face ((t (:font ,normal-font))))
+;; ;; `(speedbar-separator-face ((t (:font ,normal-font))))
+;; ;; `(speedbar-tag-face ((t (:font ,normal-font))))
+;; ;; `(subscript ((t (:font ,normal-font))))
+;; ;; `(success ((t (:font ,normal-font))))
+;; ;; `(superscript ((t (:font ,normal-font))))
+;; `(swbuff-current-buffer-face ((t (:font ,normal-font))))
+;; `(swbuff-default-face ((t (:font ,normal-font))))
+;; `(swbuff-separator-face ((t (:font ,normal-font))))
+;; `(swiper-line-face ((t (:font ,normal-font))))
+;; `(swiper-match-face-1 ((t (:font ,normal-font))))
+;; `(swiper-match-face-2 ((t (:font ,normal-font))))
+;; `(swiper-match-face-3 ((t (:font ,normal-font))))
+;; `(swiper-match-face-4 ((t (:font ,normal-font))))
+;; ;; `(table-cell ((t (:font ,normal-font))))
+;; ;; `(tex-math ((t (:font ,normal-font))))
+;; ;; `(tex-verbatim ((t (:font ,normal-font))))
+;; ;; `(tool-bar ((t (:font ,normal-font))))
+;; ;; `(tooltip ((t (:font ,normal-font))))
+;; ;; `(trailing-whitespace ((t (:font ,normal-font))))
+;; ;; `(tty-menu-disabled-face ((t (:font ,normal-font))))
+;; ;; `(tty-menu-enabled-face ((t (:font ,normal-font))))
+;; ;; `(tty-menu-selected-face ((t (:font ,normal-font))))
+;; ;; `(underline ((t (:font ,normal-font))))
+;; ;; `(variable-pitch ((t (:font ,normal-font))))
+;; ;; `(vc-conflict-state ((t (:font ,normal-font))))
+;; ;; `(vc-edited-state ((t (:font ,normal-font))))
+;; ;; `(vc-locally-added-state ((t (:font ,normal-font))))
+;; ;; `(vc-locked-state ((t (:font ,normal-font))))
+;; ;; `(vc-missing-state ((t (:font ,normal-font))))
+;; ;; `(vc-needs-update-state ((t (:font ,normal-font))))
+;; ;; `(vc-removed-state ((t (:font ,normal-font))))
+;; ;; `(vc-state-base ((t (:font ,normal-font))))
+;; ;; `(vc-up-to-date-state ((t (:font ,normal-font))))
+;; ;; `(vertical-border ((t (:font ,normal-font))))
+;; ;; `(warning ((t (:font ,normal-font))))
+;; ;; `(widget-button ((t (:font ,normal-font))))
+;; ;; `(widget-button-pressed ((t (:font ,normal-font))))
+;; ;; `(widget-documentation ((t (:font ,normal-font))))
+;; ;; `(widget-field ((t (:font ,normal-font))))
+;; ;; `(widget-inactive ((t (:font ,normal-font))))
+;; ;; `(widget-single-line-field ((t (:font ,normal-font))))
+;; ;; `(window-divider ((t (:font ,normal-font))))
+;; ;; `(window-divider-first-pixel ((t (:font ,normal-font))))
+;; ;; `(window-divider-last-pixel ((t (:font ,normal-font))))
+#+END_SRC
+
+** End
+
+#+BEGIN_SRC emacs-lisp 
+  ))
+#+END_SRC
+
+* Provide
+
+#+BEGIN_SRC emacs-lisp 
+(provide-theme 'personal)
+#+END_SRC
+
