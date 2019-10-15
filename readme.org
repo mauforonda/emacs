@@ -3,6 +3,8 @@
 #+TODO: inactive 
 #+PROPERTY: header-args :results silent
 
+[[./screen.png]]
+
 * Package locations
 
 Sources
