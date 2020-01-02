@@ -1,402 +1,294 @@
 #+TITLE: Emacs
 #+STARTUP: content
-#+TODO: inactive 
 #+PROPERTY: header-args :results silent
 
 [[./screen.png]]
 
-* Package locations
+* Variables
 
-Sources
+** Custom packages
+
+#+begin_src emacs-lisp
+(setq m/package-dir "/home/m/.emacs.d/personal/packages/")
+#+end_src
+
+** Custom themes 
+
+#+begin_src emacs-lisp
+(setq m/theme-dir "/home/m/.emacs.d/personal/theme/") ;; directory
+(setq m/theme 'personal) ;; theme name
+#+end_src
+
+** Margins
+
+#+begin_src emacs-lisp
+(setq m/margins 8) ;; margins
+#+end_src
+
+** Writing modes
+
+#+begin_src emacs-lisp
+(setq m/writing-modes '(org-mode))
+#+end_src
+
+** Programming modes
+
+#+begin_src emacs-lisp
+(setq m/programming-modes '(js-mode
+			    python-mode
+			    html-mode
+			    java-mode
+			    c-mode
+			    css-mode
+			    ruby-mode
+			    sh-mode
+			    kotlin-mode
+			    racket-mode
+			    conf-mode
+			    fundamental-mode
+			    emacs-lisp-mode
+			    lisp-interaction-mode))
+#+end_src
+
+** Header icons color
+
+#+begin_src emacs-lisp
+(setq m/header-icon-face 'all-the-icons-lblue) ;; Face for icons
+#+end_src
+
+** Tab indent
+
+#+begin_src emacs-lisp
+(setq m/indent 2)
+#+end_src
+
+** Focused window colors
+
+#+begin_src emacs-lisp
+(defun m/focused()
+  (list (face-remap-add-relative 'default '(:background "#fdfcff"))
+	(face-remap-add-relative 'header-line '(:background "#ffffff" :foreground "#677174" :overline "#ffffff" :box (:line-width 7 :color "#ffffff")))
+	(face-remap-add-relative 'org-hide '(:background "#fdfcff" :foreground "#fdfcff"))
+	(face-remap-add-relative 'org-block '(:background "#f6f8fa"))
+	(face-remap-add-relative 'org-agenda-filter-tags '(:box (:line-width 5 :color "#fdfcff")))
+	))
+#+end_src
+
+** Spam 
+
+#+begin_src emacs-lisp
+(setq m/spam '(
+	       "^ "
+	       "^\\*Buffer List\\*$"
+	       "^\\*Backtrace\\*$"
+	       "^\\*WoMan-Log\\*$"
+	       "^\\*Compile-Log\\*$"
+	       "^\\*tramp/.+\\*$"
+	       "^\\*evil-marks\\*$"
+	       "^\\*evil-registers\\*$"
+	       "^\\*Shell Command Output\\*$"
+	       "^\\*helm[- ].+\\*$"
+	       "^\\*magit\\(-\\w+\\)?: .+$"
+	       "^\\*irc\\..+\\*$"
+	       "\\*helm-mode"
+	       "\\*Echo Area"
+	       "\\*Minibuf"
+	       "\\ *code-conversion-work\\*"
+	       "org-src-fontification.+"
+	       "\\*helm-mode.+"
+	       "\\*Org-Babel Error"))
+
+#+end_src
+
+** Sidebar
+
+#+begin_src emacs-lisp
+ (setq m/sidebar "/home/m/studio/sidebar.org")
+#+end_src
+
+** Default applications
+
+#+begin_src emacs-lisp
+ (require 'openwith)
+ (setq openwith-associations '(
+                               ("\\.pdf\\'" "firefox" (file))
+                               ("\\.jpg\\'" "feh" (file))
+                               ("\\.png\\'" "feh" (file))
+                               ("\\.jpeg\\'" "feh" (file))))
+#+end_src
+
+* Packages
+
+** Locations
+
+Package repositories
 
 #+BEGIN_SRC emacs-lisp 
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
 #+END_SRC
 
-Custom local path
+Local packages
 
 #+BEGIN_SRC emacs-lisp 
-(add-to-list 'load-path "/home/m/.emacs.d/personal/packages/")
+(add-to-list 'load-path m/package-dir)
 #+END_SRC
 
+** Load 
 
-* Edit Emacs
+Helm
 
-Assuming this file is located outside =~/.emacs.d= for backup purposes, copy this file back when it gets saved.
+#+begin_src emacs-lisp
+(require 'helm)
+(require 'helm-config)
+(helm-mode 1)
+#+end_src
 
-#+BEGIN_SRC emacs-lisp 
-(defun m/onsave_emacs()
-  
-  (let (
-        (m/pwd "/home/m/auricio/boot/emacs/emacs.org") ;; editing path
-        (m/emacsd "/home/m/.emacs.d/")) ;; load path
-    
-    (when (string= buffer-file-name m/pwd)
-      (copy-file m/pwd m/emacsd t)
-      (message (concat "Copied to " m/emacsd)))))
+* Canvas
+** Minimalism
 
-(add-hook 'after-save-hook 'm/onsave_emacs)
-#+END_SRC
+*** Remove default visual elements
 
-Whenever I save my personal theme, which I keep in an org-mode document, tangle and recompile it, copy it back to a place recognized by =custom-theme-load-path=, and load back the theme into existance.
+No splash screen
 
-#+BEGIN_SRC emacs-lisp 
-(add-to-list 'custom-theme-load-path "/home/m/.emacs.d/personal/theme/")
+#+begin_src emacs-lisp
+(setq inhibit-splash-screen t)
+#+end_src
 
-(defun m/onsave_theme()
-  
-  
-  (let (
-        (m/themepath "/home/m/.emacs.d/personal/theme/") ;; editing path
-        (m/themename "personal") ;; theme name
-        (m/themenameload 'personal) ;; argument to load-theme
-        (m/themeload "/home/m/.emacs.d/personal/theme/") ;; load path
-        )
-    
-    (when (string= buffer-file-name (concat m/themepath m/themename "-theme.org"))
-      (org-babel-tangle-file
-       (concat m/themepath m/themename "-theme.org")
-       (concat m/themepath m/themename "-theme.el"))
-      (byte-recompile-directory m/themepath)
-      (load-theme m/themenameload t)
-      (message "Reloaded Theme"))
-    
-    ))
+No toolbar
 
-(add-hook 'after-save-hook 'm/onsave_theme)
+#+begin_src emacs-lisp
+(tool-bar-mode -1)
+#+end_src
 
-#+END_SRC
+No menubar
 
+#+begin_src emacs-lisp
+(menu-bar-mode -99)
+#+end_src
 
-* Basic look
+No bells
+
+#+begin_src emacs-lisp
+(setq visible-bell 1)
+#+end_src
+
+No scrollbars
+
+#+begin_src emacs-lisp
+(set-scroll-bar-mode nil)
+(setq horizontal-scroll-bar-mode nil)
+#+end_src
+
+No modeline
+
+#+begin_src emacs-lisp
+(setq-default mode-line-format " ")
+(setq helm-mode-line-string nil)
+#+end_src
+
+No line numbers
+
+#+begin_src emacs-lisp
+(setq-default line-number-mode nil)
+#+end_src
+
+*** Margins
+
+#+begin_src emacs-lisp
+(fringe-mode '(0 . 0))
+(setq-default left-margin-width m/margins)
+(setq-default right-margin-width m/margins)
+#+end_src
+
+** Theme
+
+*** Load
+
+Theme directory
+
+#+begin_src emacs-lisp
+(add-to-list 'custom-theme-load-path m/theme-dir)
+#+end_src
 
 Load theme
 
-#+BEGIN_SRC emacs-lisp 
-  (load-theme 'personal t)
-#+END_SRC
+#+begin_src emacs-lisp
+(load-theme m/theme t)
+#+end_src
 
-Remove basic visual elements 
+*** Hot reloading
 
-#+BEGIN_SRC emacs-lisp 
-(setq inhibit-splash-screen t) ;; No intro
-(tool-bar-mode -1) ;; No toolbar
-(menu-bar-mode -99) ;; No menubar
-(setq visible-bell 1) ;; No bells
-(set-scroll-bar-mode nil) ;; No vertical scrollbar
-(setq horizontal-scroll-bar-mode nil) ;; No horizontal scrollbar
-(setq-default line-number-mode nil)
-(setq-default mode-line-format " ") ;; The simplest modeline
-(setq helm-mode-line-string nil)
-#+END_SRC 
-
-Display words like you would expect in a modern editor
+Every time you save the =org= of a specified theme located in the theme directory, it will tangle, recompile and reload itself. 
 
 #+BEGIN_SRC emacs-lisp 
-;; UTF-8
-(prefer-coding-system 'utf-8)
-(set-default-coding-systems 'utf-8)
-(set-terminal-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
-(setq default-buffer-file-coding-system 'utf-8)
-;; Wrap words
-(global-visual-line-mode t)
-;; Highlight the cursor line
-(global-hl-line-mode 1)
-(setq-default cursor-type 'box)
-;; Line spacing
-(setq-default line-spacing 3)
-;; No cursor in non-selected windows
-(setq-default cursor-in-non-selected-windows nil)
-#+END_SRC
-
-Have a huge fringe for visual comfort
-
-#+BEGIN_SRC emacs-lisp 
-(fringe-mode '(40 . 40))
-#+END_SRC
-
-Some visual elements are specific to writing, programming or temporary buffers, so I classify these.
-
-#+BEGIN_SRC emacs-lisp 
-(setq 
- m/writing_modes
- '(
-   org-mode-hook
-   pollen-mode-hook
-   )
- m/programming_modes
- '(
-   js-mode-hook
-   python-mode-hook
-   html-mode-hook
-   c-mode-hook
-   css-mode-hook
-   ruby-mode-hook
-   sh-mode-hook
-   kotlin-mode-hook
-   racket-mode-hook
-   conf-mode-hook
-   fundamental-mode-hook
-   emacs-lisp-mode-hook
-	 smali-mode-hook
-   )
- m/temporary_modes
- '(
-   lisp-interaction-mode-hook
-   Man-mode-hook
-   ))
+  (defun m/hotreload-theme()
+    "Every time you save the org representation of `m/theme', located in m/theme-dir, it will tangle, recompile and reload itself."
+    (let ((m/theme-file (concat (prin1-to-string m/theme) "-theme.")))
+      (when (string= buffer-file-name (concat m/theme-dir m/theme-file "org"))
+	(org-babel-tangle-file (concat m/theme-dir m/theme-file "org")
+			       (concat m/theme-dir m/theme-file "el"))
+	(byte-recompile-directory m/theme-dir)
+	(load-theme m/theme t)
+	(message (concat " :arrows-counterclockwise: " m/theme-file " theme reloaded")))))
+    
+  (add-hook 'after-save-hook 'm/hotreload-theme)
 
 #+END_SRC
 
-Monospaced fonts only for programming modes
+* Windows
+** Header
 
-#+BEGIN_SRC emacs-lisp 
-(defun m/monospaced-font ()
-  (interactive)
-  (setq buffer-face-mode-face '(:family "Hack"))
-  (buffer-face-mode))
+The header consists of the major-mode icon and the filename or, if absent, buffername
 
-(dolist (m/mode m/programming_modes)
-  (add-hook m/mode 'm/monospaced-font))
-#+END_SRC
+#+begin_src emacs-lisp
+  (setq-default header-line-format
+		'("            "
+		  (:eval (all-the-icons-icon-for-mode major-mode :face m/header-icon-face))
+		  "   "
+		  (:eval (if buffer-file-name
+			     (s-join "." (butlast (split-string (file-name-nondirectory (buffer-file-name)) "\\.")))
+			   (buffer-name)))))
+#+end_src
 
-A header for every type of buffer
+No header for helm buffers
 
-#+BEGIN_SRC emacs-lisp  
-(defun m/orgmodeheader ()
-  (if (string-match-p ".*\\.org\-." (buffer-name))
-      (nth 0 (split-string (nth 1 (split-string (buffer-name) ".org-")) "-"))
-    (nth 0 (split-string (file-name-nondirectory (buffer-file-name)) "\\."))))
+#+begin_src emacs-lisp
+(defun m/noheader()
+  (with-helm-buffer
+    (setq header-line-format nil)))
 
-;; Display filename without extension or org-mode title or header name (in an indirect buffer)
-(defun m/headerclean ()
-  (setq header-line-format
-        '("     "
-	  (:eval (all-the-icons-icon-for-mode 'org-mode :face 'all-the-icons-purple-alt))
-	  "   "
-	  (:eval (m/orgmodeheader))
-	  )))
+(add-hook 'helm-after-initialize-hook 'm/noheader)
+#+end_src
 
-;; Display filename
-(defun m/headerfilename()
-  (setq header-line-format
-	'("     "
-	  (:eval (all-the-icons-icon-for-file (file-name-nondirectory buffer-file-name) :face 'all-the-icons-purple-alt))
-	  "   "
-	  (:eval (file-name-nondirectory buffer-file-name))
-	  )))
+** Scroll
 
-;; Display buffer name
-(defun m/headerbuffername ()
-  (interactive)
-  (setq header-line-format
-	'("     "
-	  (:eval (buffer-name))
-	  )))
-;; Apply header to modes
-(defun m/header-apply (modes header)
-  (dolist (m/mode modes)
-    (add-hook m/mode header)))
-;; Apply
-(m/header-apply m/writing_modes 'm/headerclean)
-(m/header-apply m/programming_modes 'm/headerfilename)
-(m/header-apply m/temporary_modes 'm/headerbuffername)
+Mouse
 
-#+END_SRC
-
-Line numbers only for programming buffers
-
-#+BEGIN_SRC emacs-lisp 
-(setq linum-format "  %d ")
-;; Disable line numbers
-(defun m/islinum(modes linumstate)
-  (cond
-   ((= linumstate 0)
-    (dolist (m/mode modes)
-      (add-hook m/mode (lambda ()
-                         (linum-mode 0)))))
-   ((= linumstate 1)
-    (dolist (m/mode modes)
-      (add-hook m/mode (lambda ()
-                         (linum-mode 1)))))))
-
-;; Apply
-(m/islinum m/writing_modes 0)
-(m/islinum m/temporary_modes 0)
-(m/islinum m/programming_modes 1)
-
-#+END_SRC
-
-blink to find the cursor fast
-
-#+BEGIN_SRC emacs-lisp 
-;; (beacon-mode t)
-;; (setq beacon-color "#ffd8fe")
-;; (setq beacon-blink-when-focused  t)
-;; (setq beacon-blink-when-window-scrolls nil)
-;; (setq beacon-blink-when-point-moves nil)
-;; (setq beacon-blink-when-window-changes nil)
-;; (setq beacon-blink-when-buffer-changes nil)
-;; (setq beacon-blink-when-point-moves-vertically 5)
-#+END_SRC
-
-* Edit buffers
-
-Write over the selected range
-
-#+BEGIN_SRC emacs-lisp 
-(delete-selection-mode 1)
-
-#+END_SRC
-
-Move cursor up and down
-
-#+BEGIN_SRC emacs-lisp 
-;; (global-set-key (kbd "<up>") 'previous-logical-line)
-;; (global-set-key (kbd "<down>") 'next-logical-line)
-(global-set-key (kbd "<up>") 'previous-line)
-(global-set-key (kbd "<down>") 'next-line)
-(setq-default line-move-visual nil)
-(global-set-key (kbd "<end>") 'end-of-line)
-(global-set-key (kbd "<home>") 'beginning-of-line)
-
-(global-set-key (kbd "<s-next>") 'end-of-line)
-(global-set-key (kbd "<s-prior>") 'beginning-of-line)
-
-#+END_SRC
-
-Scroll up and down
-
-#+BEGIN_SRC emacs-lisp 
-;; Mouse scrolling
+#+begin_src emacs-lisp
 (setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
 (setq mouse-wheel-progressive-speed nil)
 (setq mouse-wheel-follow-mouse 't)
 (setq scroll-step 1)
-;; Keyboard scrolling
+#+end_src
+
+Keyboard
+
+#+begin_src emacs-lisp
 (defun m/scrolldown ()
   (interactive)
   (scroll-up 1))
 (defun m/scrollup ()
   (interactive)
   (scroll-down 1))
-;; Keys to scroll
 (global-set-key [(next)] 'm/scrolldown)
 (global-set-key [(prior)]   'm/scrollup)
+#+end_src
 
-#+END_SRC
-
-Undo
-
-#+BEGIN_SRC emacs-lisp 
-(global-set-key (kbd "C-z") 'undo)
-
-#+END_SRC
-
-Select all 
-
-#+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "C-a")  'mark-whole-buffer)
-  (define-key org-mode-map [(control a)] 'mark-whole-buffer)
-
-#+END_SRC
-
-Search
+** Resize
 
 #+BEGIN_SRC emacs-lisp 
-;; (with-eval-after-load 'helm-regexp
-;;   (setq helm-source-occur
-;;         (helm-make-source "Occur" 'helm-source-multi-occur :follow 1)))
-;; (define-key global-map (kbd "C-s") 'helm-occur)
-
-(define-key global-map (kbd "C-s") 'swiper)
-
-#+END_SRC
-
-Avoid automatic backup files
-
-#+BEGIN_SRC emacs-lisp 
-(setq make-backup-files nil)
-(setq auto-save-default nil)
-(setq create-lockfiles nil)
-
-#+END_SRC
-
-Revert buffer when changed on disk
-
-#+BEGIN_SRC emacs-lisp 
-(global-auto-revert-mode 1)
-
-#+END_SRC
-
-Spell checking
-
-#+BEGIN_SRC emacs-lisp 
-(setq-default flyspell-issue-message-flag nil)
-(ispell-change-dictionary "espanol")
-(defun m/flyspell-remember-word ()
-  (interactive)
-  (let ((current-location (point))
-	(word (flyspell-get-word)))
-    (when (consp word)    
-      (flyspell-do-correct 'save nil (car word) current-location (cadr word) (caddr word) current-location))))
-(with-eval-after-load 'flyspell
-  (define-key flyspell-mode-map (kbd "C-M-u") 'm/flyspell-remember-word))
-
-#+END_SRC
-
-Default width
-#+BEGIN_SRC emacs-lisp 
-(setq default-tab-width 2)
-(setq css-indent-offset 2)
-(setq indent-tabs-mode nil)
-;; (setq-default adaptive-wrap-extra-indent 0)
-;; (add-hook 'visual-line-mode-hook #'adaptive-wrap-prefix-mode)
-#+END_SRC
-
-Helpers
-
-#+BEGIN_SRC emacs-lisp 
-
-;; normalize text copied from a pdf
-
-(defun m/pdfcleanup ()
-	"Replace newlines copied from PDFs"
-  (interactive)
-  (save-restriction
-    (narrow-to-region (point) (mark))
-    (goto-char (point-min))
-    (while (search-forward "\n" nil t) (replace-match " " nil t))
-		(goto-char (point-min))
-    (while (search-forward "​" nil t) (replace-match " " nil t))
-    (goto-char (point-min))
-    (while (re-search-forward "\s\s*" nil t) (replace-match " " nil t))
-		)
-	)
-#+END_SRC
-
-Smartparens
-
-#+BEGIN_SRC emacs-lisp 
-(require 'smartparens-config)
-(smartparens-global-mode)
-(sp-with-modes 'org-mode
-	(sp-local-pair "$" "$"))
-;; (setq m/smartparens_modes
-;; 			'(org-mode-hook pollen-mode-hook python-mode-hook inferior-python-mode-hook emacs-lisp-mode-hook js-mode-hook))
-;; (dolist (mode m/programming_modes)
-;;   (add-hook mode #'smartparens-mode))
-#+END_SRC
-
-
-* Window operations
-
-Resize this window
-
-#+BEGIN_SRC emacs-lisp 
-(defhydra m/windowresize (:hint nil)
+(defhydra m/winresize (:hint nil)
   "← ↑ → ↓"
   ("<left>" (shrink-window-horizontally 10))
   ("<right>" (enlarge-window-horizontally 10))
@@ -404,1280 +296,740 @@ Resize this window
   ("<down>" (shrink-window 10))
   ("q" nil)
   )
-(global-set-key (kbd "M-r") 'm/windowresize/body)
 
+(global-set-key (kbd "M-r") 'm/winresize/body)
 #+END_SRC
 
-Kill this buffer. Unlike =kill-this-buffer=, it works when multiple frames are open
+** Open and close
 
-#+BEGIN_SRC emacs-lisp 
-(defun kill-buffer-and-its-windows (buffer)
-  "Kill BUFFER and delete its windows.  Default is `current-buffer'.
-BUFFER may be either a buffer or its name (a string)."
-  ;; (interactive (list (read-buffer "Kill buffer: " (current-buffer) 'existing)))
-  (interactive (list (current-buffer)))
-  (setq buffer (get-buffer buffer))
-  ;; (setq buffer  (get-buffer buffer))
-  (if (buffer-live-p buffer)            ; Kill live buffer only.
-      (let ((wins  (get-buffer-window-list buffer nil t))) ; On all frames.
-        (when (and (buffer-modified-p buffer)
-                   (fboundp '1on1-flash-ding-minibuffer-frame))
-          (1on1-flash-ding-minibuffer-frame t)) ; Defined in `oneonone.el'.
-        (when (kill-buffer buffer)      ; Only delete windows if buffer killed.
-          (dolist (win  wins)           ; (User might keep buffer if modified.)
-            (when (window-live-p win)
-              ;; Ignore error, in particular,
-              ;; "Attempt to delete the sole visible or iconified frame".
-              (condition-case nil (delete-window win) (error nil))))))
-    (when (interactive-p)
-      (error "Cannot kill buffer.  Not a live buffer: `%s'" buffer))))
-
-(defun m/kill-buffer ()
-  (interactive)
-  (kill-buffer (current-buffer)))
-
-;; (global-set-key (kbd "C-x k") 'kill-buffer-and-its-windows)
-(global-set-key (kbd "C-x k") 'm/kill-buffer)
-;; (substitute-key-definition 'kill-buffer 'kill-buffer-and-its-windows global-map)
-#+END_SRC
-
-
-* Navigate buffers
-
-Move focus to other displayed windows
-
-#+BEGIN_SRC emacs-lisp 
-;; (eval-after-load "org"
-;;   '(progn
-;;      (define-key org-mode-map (kbd "<M-S-left>") nil)
-;;      (define-key org-mode-map (kbd "<M-S-right>") nil)
-;;      (define-key org-mode-map (kbd "<M-left>") nil)
-;;      (define-key org-mode-map (kbd "<M-right>") nil)))
-
-(global-set-key (kbd "M-s-<left>")  'windmove-left)
-(global-set-key (kbd "M-s-<right>") 'windmove-right)
-(global-set-key (kbd "M-s-<up>")    'windmove-up)
-(global-set-key (kbd "M-s-<down>")  'windmove-down)
-#+END_SRC
-
-Visual indicator for focused window
-
-#+begin_src emacs-lisp
-(require 'highlight-focus)
-#+end_src
-
-Buffers I don't want to see in navigation
-
-#+BEGIN_SRC emacs-lisp 
-(setq m/spambuffers '(
-		      "^ "
-		      "^\\*Buffer List\\*$"
-		      "^\\*Backtrace\\*$"
-		      "^\\*WoMan-Log\\*$"
-		      "^\\*Compile-Log\\*$"
-		      "^\\*tramp/.+\\*$"
-		      "^\\*evil-marks\\*$"
-		      "^\\*evil-registers\\*$"
-		      "^\\*Shell Command Output\\*$"
-		      "^\\*helm[- ].+\\*$"
-		      "^\\*magit\\(-\\w+\\)?: .+$"
-		      "^\\*irc\\..+\\*$"
-		      "\\*helm-mode"
-		      "\\*Echo Area"
-		      "\\*Minibuf"
-		      "\\ *code-conversion-work\\*"
-		      "org-src-fontification.+"
-		      "\\*helm-mode.+"
-		      "\\*Org-Babel Error"))
-#+END_SRC
-
-Cycle through work buffers in order of recency
-
-#+BEGIN_SRC emacs-lisp 
-;; Set swbuff
-(require 'swbuff)
-(setq swbuff-recent-buffers-first t)
-(setq swbuff-separator " · ")
-;; Exclude these buffers
-(setq swbuff-exclude-buffer-regexps m/spambuffers)
-;; Keys to cycle
-(global-set-key [(C-next)] 'swbuff-switch-to-next-buffer)
-(global-set-key [(C-prior)]   'swbuff-switch-to-previous-buffer)
-
-;; (global-set-key [(C-next)] 'bs-cycle-next)
-;; (global-set-key [(C-prior)]   'bs-cycle-previous)
-
-;; bs-configurations
-
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp 
-;; (global-set-key [(C-next)] 'switch-to-prev-buffer)
-;; (global-set-key [(C-prior)] 'switch-to-next-buffer)
-
-#+END_SRC
-
-Go straight to a desired buffer
-
-#+BEGIN_SRC emacs-lisp :results silent 
-;; Set helm
-(require 'helm)
-(require 'helm-config)
-(helm-mode 1)
-(setq helm-full-frame nil)
-(setq helm-split-window-in-side-p t)
-(setq helm-split-window-default-side 'below)
-(setq helm-display-buffer-default-width 50)
-;; Avoid buffer details
-(setq helm-buffer-details-flag 'nil)
-;; Exclude these buffers
-(setq helm-boring-buffer-regexp-list m/spambuffers)
-
-(setq helm-mini-default-sources '(
-                                  helm-source-buffers-list
-                                  helm-source-files-in-current-dir
-                                  helm-source-file-name-history
-                                  ;; helm-source-recentf
-                                  ;; helm-source-buffer-not-found
-                                  ))
-
-;; Keys to navigate
-(global-set-key (kbd "M-SPC") 'helm-mini)
-
-#+END_SRC
-
-Go straight to a set of bookmarks
-
-#+BEGIN_SRC emacs-lisp 
-;; (global-set-key (kbd "C-M-SPC") 'helm-filtered-bookmarks)
-
-#+END_SRC
-
-Open new buffer
+Open
 
 #+BEGIN_SRC emacs-lisp 
 (global-set-key (kbd "C-x C-f") 'helm-find-files)
 (setq helm-ff-kill-or-find-buffer-fname-fn 'ignore)
-
 #+END_SRC
 
+Close
 
-* Manage sessions
+#+begin_src emacs-lisp
+(defun m/kill-buffer ()
+  (interactive)
+  (kill-buffer (current-buffer)))
 
-Save buffer list
+(global-set-key (kbd "C-x k") 'm/kill-buffer)
+#+end_src
+
+** Move focus
+
+Move
+
+#+begin_src emacs-lisp
+(global-set-key (kbd "M-s-<left>")  'windmove-left)
+(global-set-key (kbd "M-s-<right>") 'windmove-right)
+(global-set-key (kbd "M-s-<up>")    'windmove-up)
+(global-set-key (kbd "M-s-<down>")  'windmove-down)
+#+end_src
+
+Change the look of focused windows
+
+#+begin_src emacs-lisp
+;; Stolen from Amit Patel's highlight-focus.el
+
+(require 'face-remap)
+(defvar highlight-focus:last-buffer nil)
+(defvar highlight-focus:cookie nil)
+(defvar highlight-focus:app-has-focus t)
+
+(defun highlight-focus:check ()
+  "Check if focus has changed, and if so, update remapping."
+  (let ((current-buffer (and highlight-focus:app-has-focus (current-buffer))))
+    (unless (eq highlight-focus:last-buffer current-buffer)
+      (when (and highlight-focus:last-buffer highlight-focus:cookie)
+        (with-current-buffer highlight-focus:last-buffer
+	  (dolist (m/face highlight-focus:cookie)
+	    (face-remap-remove-relative m/face))))
+      (setq highlight-focus:last-buffer current-buffer)
+      (when current-buffer
+        (setq highlight-focus:cookie (m/focused))
+	))))
+
+(defun highlight-focus:app-focus (state)
+  (setq highlight-focus:app-has-focus state)
+  (highlight-focus:check))
+
+(defadvice other-window (after highlight-focus activate)
+  (highlight-focus:check))
+(defadvice select-window (after highlight-focus activate)
+  (highlight-focus:check))
+(defadvice select-frame (after highlight-focus activate)
+  (highlight-focus:check))
+(add-hook 'window-configuration-change-hook 'highlight-focus:check)
+
+(add-hook 'focus-in-hook (lambda () (highlight-focus:app-focus t)))
+(add-hook 'focus-out-hook (lambda () (highlight-focus:app-focus nil)))
+
+#+end_src
+
+
+** Helm windows
+
+Make helm windows pop from below
+
+#+begin_src emacs-lisp
+(setq helm-full-frame nil)
+(setq helm-split-window-in-side-p t)
+(setq helm-split-window-default-side 'below)
+#+end_src
+
+Make helm windows look like other focused windows and remove the header
+
+#+begin_src emacs-lisp
+(setq helm-display-header-line nil)
+
+(defun m/focused-helm ()
+  "Visual changes for contextual buffers."
+  (variable-pitch-mode)
+  (m/focused)
+  (setq header-line-format nil)
+  (setq left-margin-width m/margins)
+  (setq right-margin-width m/margins))
+
+(defun m/apply-focused-helm ()
+  "Apply contextual visual changes to Helm buffers."
+  (with-helm-buffer (m/focused-helm)))
+
+(add-hook 'helm-after-initialize-hook 'm/apply-focused-helm)
+#+end_src
+
+** Cycle
+
+Cycle over open buffers except those in m/spam
+
+#+begin_src emacs-lisp
+(require 'swbuff)
+(setq swbuff-recent-buffers-first t)
+(setq swbuff-separator " · ")
+(setq swbuff-exclude-buffer-regexps m/spam)
+(global-set-key [(C-next)] 'swbuff-switch-to-next-buffer)
+(global-set-key [(C-prior)]   'swbuff-switch-to-previous-buffer)
+#+end_src
+
+** Go to buffer
+
+Interactively select a buffer from open buffers, files in current directory and recently opened files
+
+#+begin_src emacs-lisp
+(setq helm-buffer-details-flag 'nil)
+(setq helm-boring-buffer-regexp-list m/spam)
+(setq helm-mini-default-sources '(
+                                  helm-source-buffers-list
+                                  helm-source-files-in-current-dir
+                                  helm-source-file-name-history
+                                  ))
+(global-set-key (kbd "M-SPC") 'helm-mini)
+#+end_src
+
+
+** Persist across sessions
+
+Save buffers across sessions
 
 #+BEGIN_SRC emacs-lisp 
 (desktop-save-mode 1)
-
 #+END_SRC
 
-Save cursor state
+Save cursor position across sessions
 
 #+BEGIN_SRC emacs-lisp 
 (require 'saveplace)
 (setq-default save-place t)
-
 #+END_SRC
 
+* Text
+** Display
 
-* Discover functions
+UTF-8
 
-Search all interactive functions in a context
+#+begin_src emacs-lisp
+(prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(setq default-buffer-file-coding-system 'utf-8)
+#+end_src
+
+Wrap long sentences
+
+#+begin_src emacs-lisp
+(global-visual-line-mode t)
+#+end_src
+
+Highlight the cursor in the focused window 
+
+#+begin_src emacs-lisp
+(global-hl-line-mode 1)
+(setq-default cursor-type 'box)
+(setq-default cursor-in-non-selected-windows nil)
+#+end_src
+
+Space between lines
+
+#+begin_src emacs-lisp
+(setq-default line-spacing 3)
+#+end_src
+
+Emoji
+
+#+begin_src emacs-lisp
+(add-hook 'after-init-hook #'global-emojify-mode)
+#+end_src
+
+** Edit
+
+*** Move cursor
+
+Between lines
+
+#+begin_src emacs-lisp
+(setq-default line-move-visual nil)
+(global-set-key (kbd "<up>") 'previous-line)
+(global-set-key (kbd "<down>") 'next-line)
+#+end_src
+
+To the begining or end of line
+
+#+begin_src emacs-lisp
+(global-set-key (kbd "<C-right>") 'end-of-line)
+(global-set-key (kbd "<C-left>") 'beginning-of-line)
+#+end_src
+
+*** Select range
+
+Select all
+
+#+begin_src emacs-lisp
+(global-set-key (kbd "C-a")  'mark-whole-buffer)
+(define-key org-mode-map [(control a)] 'mark-whole-buffer)
+#+end_src
+
+Write over the range
+
+#+begin_src emacs-lisp
+(delete-selection-mode 1)
+#+end_src
+
+*** Disk
+
+No automatic backups
 
 #+BEGIN_SRC emacs-lisp 
-(define-key global-map (kbd "<print>") 'helm-M-x)
+(setq make-backup-files nil)
+(setq auto-save-default nil)
+(setq create-lockfiles nil)
 #+END_SRC
 
-
-* Search the web
-
-Google selection by =C-c / RET RET=, opens on Firefox
-
-#+BEGIN_SRC  emacs-lisp 
-(google-this-mode 1)
-
-#+END_SRC
-
-Search Wikipedia for a selection by =M-s M-w=, opens on eww
+Revert buffer when changed on disk
 
 #+BEGIN_SRC emacs-lisp 
-(setq eww-search-prefix "https://en.m.wikipedia.org/w/index.php?search=")
-
+(global-auto-revert-mode 1)
 #+END_SRC
 
-google translate
+*** Tab indent
+
+#+begin_src emacs-lisp
+ (setq default-tab-width m/indent)
+ (setq css-indent-offset m/indent)
+ (setq js-indent-level m/indent)
+ (setq js2-basic-indent m/indent)
+ (setq js2-basic-offset m/indent)
+ (setq python-indent-offset m/indent)
+ (setq indent-tabs-mode nil)
+#+end_src
+
+*** Undo
+
+#+begin_src emacs-lisp
+(global-set-key (kbd "C-z") 'undo)
+#+end_src
+
+*** Org
+
+Hide markers
+
+#+begin_src emacs-lisp
+(setq org-hide-emphasis-markers t)
+#+end_src
+
+Follow links 
+
+#+begin_src emacs-lisp
+ (setq org-return-follows-link t)
+ (setq browse-url-browser-function 'browse-url-xdg-open)
+#+end_src
+
+Select with shift
+
+#+begin_src emacs-lisp
+ (setq org-support-shift-select 'always)
+#+end_src
+
+*** Move lines
+
+Move lines up or down
+
+#+begin_src emacs-lisp
+ (defun m/move-line (arg)
+   "Drag the line at point ARG lines forward."
+   (interactive "p")
+   (dotimes (_ (abs arg))
+     (let ((c (current-column)))
+       (if (< 0 arg)
+           (progn
+             (beginning-of-line 2)
+             (transpose-lines 1)
+             (beginning-of-line 0))
+         (transpose-lines 1)
+         (beginning-of-line -1)))))
+
+ (defun m/move-line-up()
+   (interactive)
+   (m/move-line -1))
+
+ (defun m/move-line-down()
+   (interactive)
+   (m/move-line 1))
+
+ (global-set-key (kbd "<M-S-up>") 'm/move-line-up)
+ (global-set-key (kbd "<M-S-down>") 'm/move-line-down)
+
+#+end_src
+
+*** Search
+
+#+begin_src emacs-lisp
+ (define-key global-map (kbd "C-s") 'swiper)
+#+end_src
+
+* Programming
+
+** General
+
+Monospace font
+
+#+begin_src emacs-lisp
+ (defun m/apply-monofont ()
+   (interactive)
+   (setq buffer-face-mode-face '(:family "Hack"))
+   (buffer-face-mode))
+#+end_src
+
+Line numbers format
+
+#+begin_src emacs-lisp
+(setq linum-format "  %d ")
+#+end_src
+
+Apply monospace fonts, line numbers and rainbow delimiters
+
+#+begin_src emacs-lisp
+ (defun m/programming()
+   (m/apply-monofont)
+   (linum-mode 1)
+   (rainbow-delimiters-mode))
+
+ (dolist (m/mode m/programming-modes)
+   (add-hook (derived-mode-hook-name m/mode) 'm/programming))
+#+end_src
+
+Global smartparens
+
+#+begin_src emacs-lisp
+(require 'smartparens-config)
+(smartparens-global-mode)
+#+end_src
+
+Setup auto-complete
 
 #+BEGIN_SRC emacs-lisp 
-(setq google-translate-default-source-language "de")
-(setq google-translate-default-target-language "en")
+(ac-config-default)
+(setq ac-auto-start nil)
+(define-key ac-mode-map (kbd "M-TAB") 'auto-complete)
 #+END_SRC
 
-* Contextual buffers
+Search all files within a directory
 
-Changes applied to buffers that only display for a short moment.
+#+BEGIN_SRC emacs-lisp :results silent
+(require 'ag)
+(global-set-key (kbd "M-.") 'helm-do-ag)
+#+END_SRC
+
+** Javascript
+
+A clean js2-mode look
+
+#+begin_src emacs-lisp
+  (setq-default js2-auto-indent-p t)
+  (setq-default js2-cleanup-whitespace t)
+  (setq-default js2-indent-on-enter-key t)
+  (setq js2-mode-show-parse-errors nil)
+  (setq js2-mode-show-strict-warnings nil)
+  (defun m/js2comments ()
+    (setq comment-start "//"
+          comment-end ""
+          comment-style 'indent))
+  (add-hook 'js2-mode-hook #'m/js2comments)
+#+end_src
+
+Use eslint in node_modules
+
+#+begin_src emacs-lisp
+ (defun m/js2eslint ()
+   (let* ((root (locate-dominating-file
+                 (or (buffer-file-name) default-directory)
+                 "node_modules"))
+          (eslint (and root
+                       (expand-file-name "node_modules/eslint/bin/eslint.js"
+                                         root))))
+     (when (and eslint (file-executable-p eslint))
+       (setq-local flycheck-javascript-eslint-executable eslint))))
+ (add-hook 'flycheck-mode-hook #'m/js2eslint)
+#+end_src
+
+Use in all .js files
+
+#+begin_src emacs-lisp
+ (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+#+end_src
+
+** Python
+
+Make sure you're using python 3
+
+#+begin_src emacs-lisp
+ (setq-default elpy-rpc-python-command "python3")
+ (setq-default python-shell-interpreter "python3")
+#+end_src
+
+* Writing
+
+** Org headings
+
+*** Display
+
+Indentation
+
+#+begin_src emacs-lisp
+ (setq org-startup-indented t)
+ (setq-default org-adapt-indentation t)
+ (setq-default org-indent-indentation-per-level 2)
+
+ (defun m/org-heading-lookfix()
+   (interactive)
+   (setq org-adapt-indentation nil)
+   (require 'org-bullets)
+   (setq-default org-bullets-bullet-list '( "•"))
+   (setq org-bullets-compose-leading-stars 'hide)
+   (org-bullets-mode 1)
+   (setq org-bullets-face-name 'org-agenda-filter-tags))
+
+ (add-hook 'org-mode-hook 'm/org-heading-lookfix)
+#+end_src
+
+Bullets
+
+#+begin_src emacs-lisp
+ (setq-default org-hide-leading-stars t)
+#+end_src
+
+Ellipsis and separation between collapsed headings
+
+#+begin_src emacs-lisp
+ (setq org-ellipsis " ")
+ (setq org-cycle-separator-lines 0)
+#+end_src
+
+TODO keywords
 
 #+BEGIN_SRC emacs-lisp 
-;; (defun m/color-echo ()
-;; 	(dolist (buf '(" *Echo Area 0*" " *Echo Area 1*"))
-;; 		(with-current-buffer (get-buffer buf)
-;; 			(make-local-variable 'face-remapping-alist)
-;; 			(add-to-list 'face-remapping-alist '(default (:background "#f4f4f9" :foreground "#a4a5a5" :box (:line-width 2 :color "#f4f4f9"))))))
-
-(setq helm-display-header-line nil)
-
-(defun m/contextual-changes ()
-	"Visual changes for contextual buffers."
-	(face-remap-add-relative 'default '(:background "#fbfafc" :foreground "#706e73" :box (:line-width 2 :color "#fbfafc")))
-	(face-remap-add-relative 'header-line '(:background "#fbfafc" :foreground "#706e73" :box (:line-width 7 :color "#fbfafc")))
-	(setq left-margin-width 5)
-	(setq left-fringe-width 0)
-	(setq right-fringe-width 0))
-
-(defun m/color-helm ()
-	"Apply contextual visual changes to Helm buffers."
-  (with-helm-buffer	(m/contextual-changes)))
-		
-(defun m/context-buffers ()
-	"Apply visual changes to contextual buffers."
-	(add-hook 'help-mode-hook 'm/contextual-changes)
-	(add-hook 'dired-mode-hook 'm/contextual-changes)
-	(add-hook 'helm-after-initialize-hook 'm/color-helm))
-
-(m/context-buffers)
+ (setq-default org-todo-keywords `((sequence "⭕" "✅")))
 #+END_SRC
 
-* Nerdtab
+Tags
 
-#+BEGIN_SRC emacs-lisp
-;; (require 'nerdtab)
+#+begin_src emacs-lisp
+ (setq org-tags-column 0)
+#+end_src
 
-;; (setq nerdtab-regex-blacklist m/spambuffers)
-;; (setq nerdtab-tab-width 5)
-;; (setq window-min-width 5)
+*** Movement
 
-;; (setq nerdtab-special-tabs '("*Messages*"
-;; 															 "*scratch*"
-;; 															 "*Faces*"
-;; 															 "*Help*"
-;; 															 "emacs.org"
-;; 															 "personal-theme.org"))
-
-;; (defun m/nerdtab-visual ()
-;; 	"Visual changes for contextual buffers."
-;; 	(with-current-buffer " *nerdtab*"
-;; 		(set-window-fringes nil 0 0 nil)
-;; 		(face-remap-add-relative 'default '(:background "#ededf1" :foreground "#f2f2f2"))
-;; 		))
-
-;; (add-hook 'nerdtab-major-mode-hook 'm/nerdtab-visual)
-
-;; (defun nerdtab-cycle-next ()
-;; 	(interactive)
-;; 	(let ((tabs-length (cl-list-length nerdtab--tab-list))
-;; 				(current nerdtab--current))
-;; 		(if (= (+ 1 current) tabs-length)
-;; 				(nerdtab-jump 0)
-;; 			(nerdtab-jump (+ current 1)))
-;; 		))
-
-;; (defun nerdtab-cycle-prev ()
-;; 	(interactive)
-;; 	(let ((tabs-length (cl-list-length nerdtab--tab-list))
-;; 				(current nerdtab--current))
-;; 		(if (= 0 current)
-;; 				(nerdtab-jump (- tabs-length 1))
-;; 			(nerdtab-jump (- current 1)))
-;; 		))
-
-;; (global-set-key [(C-next)] 'nerdtab-cycle-next)
-;; (global-set-key [(C-prior)] 'nerdtab-cycle-prev)
-
-;; (defun nerdtab-move-next ()
-;; 	(interactive)
-;; 	(nerdtab-move-to (+ nerdtab--current 2)))
-
-;; (defun nerdtab-move-prev ()
-;; 	(interactive)
-;; 	(nerdtab-move-to (- nerdtab--current 1)))
-
-;; (global-set-key [(C-S-next)] 'nerdtab-move-next)
-;; (global-set-key [(C-S-prior)] 'nerdtab-move-prev)
-
-;; (global-set-key (kbd "C-x C-SPC") 'nerdtab-mode)
-
-;; (add-hook 'emacs-startup-hook #'nerdtab-mode)
-#+END_SRC
-
-* Org mode
-
-** To Do
-
-#+BEGIN_SRC emacs-lisp 
-(setq-default org-todo-keywords` ((sequence "☖" "☗")))
-#+END_SRC
-
-** Headings
-
-Display heading trees like modern outlines
-
-#+BEGIN_SRC emacs-lisp 
-;; Indent headings
-(setq org-startup-indented t)
-;; Only show one bullet per heading
-;; (setq-default org-hide-leading-stars nil)
-;; Show pretty bullets
-(setq-default org-indent-mode-turns-on-hiding-stars nil)
-(setq-default org-hide-leading-stars t)
-(add-hook 'org-mode-hook (lambda ()
-                           (interactive)
-                           (setq org-hide-leading-stars t)
-                           (require 'org-bullets)
-                           (setq org-bullets-compose-leading-stars "⋅")
-                           (org-bullets-mode 1)
-                           (setq org-bullets-face-name 'org-tag)
-                           (setq org-bullets-bullet-list '( "•"))))
-;; Don't display any special symbol if the heading is collapsed
-(setq org-ellipsis " ")
-;; Separate collapsed headings by one line
-(setq org-cycle-separator-lines 1)
-;; Apply heading background to the whole line
-;; (setq org-fontify-whole-heading-line nil)
-
-#+END_SRC
-
-
-Cycle through headings
+Cycle
 
 #+BEGIN_SRC emacs-lisp 
 (define-key org-mode-map [(control shift down)]  'outline-next-visible-heading)
 (define-key org-mode-map [(control shift up)]  'outline-previous-visible-heading)
 #+END_SRC
 
-Move straight to any heading or link to it
+Copy a link to a heading
 
-#+BEGIN_SRC emacs-lisp 
-;; Link to a heading
-(defun m/orgheadinglink (marker)
+#+begin_src emacs-lisp
+(defun m/org-heading-link (marker)
   (with-current-buffer (marker-buffer marker)
-    (let (
-          (heading-name
-           (save-excursion
-             (goto-char
-              (marker-position marker))
-             (nth 4 (org-heading-components))))
-          (file-name
-           (buffer-file-name)))
+    (let ((heading-name (save-excursion (goto-char (marker-position marker))
+					(nth 4 (org-heading-components))))
+          (file-name (buffer-file-name)))
       (with-helm-current-buffer
-        (org-insert-link
-         file-name
-         (concat "file:" file-name "::*" heading-name)
-         "❇"))
+        (org-insert-link file-name (concat "file:" file-name "::*" heading-name) (concat "🔗 " heading-name)))
       )))
+#+end_src
 
-;; Set actions for helm headings list
-(setq helm-org-headings-actions '(
-                                  ("Go to" . helm-org-goto-marker) ;; default go to
-                                  ("Insert link" . m/orgheadinglink) ;; available link to
-                                  ))
+Go to a heading
 
-;; Headings in the list are displayed along with their path 
-(setq helm-org-format-outline-path t)
-;; Key to list
-(define-key org-mode-map (kbd "C-/") 'helm-org-in-buffer-headings)
-#+END_SRC
+#+begin_src emacs-lisp
+ (setq helm-org-headings-actions '(("Go to" . helm-org-goto-marker)
+                                   ("Insert link" . m/org-heading-link)))
+ (setq helm-org-format-outline-path t)
+ (define-key org-mode-map (kbd "C-/") 'helm-org-in-buffer-headings)
+#+end_src
 
-Make a buffer from current heading to focus
+*** Numbered headings
 
-#+BEGIN_SRC emacs-lisp 
-(setq org-indirect-buffer-display 'current-window)
-(defun m/orgfocus ()
-  (interactive)
-  (let ((current-prefix-arg 4))
-    (call-interactively #'org-tree-to-indirect-buffer)))
-(define-key org-mode-map (kbd "<insert>") 'm/orgfocus)
+I tend to have files where I don't want to worry about heading titles or document structure. In this case, I make =M-RET= create only numbered headings from =1= onwards. I bind this to a minor mode that I can apply at the top of any of these files.
 
-#+END_SRC
+#+begin_src emacs-lisp
+ (defun m/org-insert-numbered-heading ()
+   "Create a heading titled as the next integer"
+   (interactive)
+   (let ((m/numbered-headings (org-map-entries (lambda () (nth 4 (org-heading-components))) nil 'file)))
+     (setq m/new-heading (number-to-string (+ 1 (string-to-number (car (last m/numbered-headings))))))
+     (org-insert-heading)
+     (insert (concat m/new-heading "\n\n"))
+     ))
 
-** Source blocks
+ (define-minor-mode m/org-spontaneous-writing-mode
+   "Minor mode to for simple exploratory writing"
+   :lighter " Spontaneous writing"
+   :keymap (let ((map (make-sparse-keymap)))
+             (define-key map (kbd "M-RET") 'm/org-insert-numbered-heading)
+             map))
+#+end_src
 
-Apply a different font between text and blocks
+** Org blocks
 
-#+BEGIN_SRC emacs-lisp 
-(defun m/variableapply(modes)
-  (dolist (m/mode modes)
-    (add-hook m/mode (lambda ()
-		       (interactive)
-		       (variable-pitch-mode)))))
+*** Create
 
-(m/variableapply m/writing_modes)
-(setq-default org-fontify-quote-and-verse-blocks t)
+#+begin_src emacs-lisp
+(require 'org-tempo)
+(setq org-structure-template-alist '(("s" . "src")
+                                     ("q" . "quote")))
+#+end_src
 
-#+END_SRC
+*** Display
 
-Syntax highlight and don't unnecessarily indent source blocks
+Prose and code feature different fonts
 
-#+BEGIN_SRC emacs-lisp 
-(setq org-src-fontify-natively t)
-(setq-default org-edit-src-content-indentation 0)
-#+END_SRC
+#+begin_src emacs-lisp
+ (add-hook 'org-mode-hook 'variable-pitch-mode)
+ (setq-default org-fontify-quote-and-verse-blocks t)
+ (setq org-src-fontify-natively t)
+#+end_src
 
-Display pretty block begin and end lines
-
-#+BEGIN_SRC emacs-lisp 
-(setq-default prettify-symbols-alist '(
-				       ("#+TITLE:". "")
-				       (":PROPERTIES:" . ":")
-				       ("#+BEGIN_SRC" . "λ") 
-				       ("#+END_SRC" . "⋱")
-				       ("#+begin_src" . "λ") 
-				       ("#+end_src" . "⋱")
-				       ("#+RESULTS:" . "»")
-				       (":END:" . "⋱")
-				       (":RESULTS:" . "⋰")
-				       ("#+NAME:" . "")
-				       ("#+BEGIN_EXAMPLE" . "~")
-				       ("#+begin_example"  . "~")
-				       ("#+END_EXAMPLE" . "~")
-				       ("#+end_example" . "~")
-				       ("#+BEGIN_VERBATIM" . "")
-				       ("#+END_VERBATIM" . "")
-				       ("#+BEGIN_VERSE" . "")
-				       ("#+END_VERSE" . "")
-				       ("#+BEGIN_QUOTE" . "𐄚")
-				       ("#+END_QUOTE" . "𐄚")
-				       ("#+TBLFM:" . "∫")
-				       ))
-(add-hook 'org-mode-hook (lambda ()
-			   (interactive)
-			   (prettify-symbols-mode)))
-
-#+END_SRC
-
-Setup languages and headers for Babel
+Block indentation
 
 #+BEGIN_SRC emacs-lisp 
-;; Languages
+ (setq-default org-edit-src-content-indentation 1)
+#+END_SRC
+
+Display icons for blocks
+
+#+begin_src emacs-lisp
+ (setq-default prettify-symbols-alist '(
+                                        ("#+TITLE:". "")
+                                        (":PROPERTIES:" . ":")
+                                        ("#+BEGIN_SRC" . "λ") 
+                                        ("#+END_SRC" . "⋱")
+                                        ("#+begin_src" . "λ") 
+                                        ("#+end_src" . "⋱")
+                                        ("#+RESULTS:" . "»")
+                                        (":END:" . "⋱")
+                                        (":RESULTS:" . "⋰")
+                                        ("#+name:" . "")
+                                        ("#+BEGIN_EXAMPLE" . "~")
+                                        ("#+begin_example"  . "~")
+                                        ("#+END_EXAMPLE" . "~")
+                                        ("#+end_example" . "~")
+                                        ("#+BEGIN_VERBATIM" . "")
+                                        ("#+END_VERBATIM" . "")
+                                        ("#+BEGIN_VERSE" . "")
+                                        ("#+END_VERSE" . "")
+                                        ("#+begin_quote" . "~")
+                                        ("#+end_quote" . "~")
+                                        ("#+TBLFM:" . "∫")))
+ (add-hook 'org-mode-hook 'prettify-symbols-mode)
+#+end_src
+
+Open in the same window
+
+#+begin_src emacs-lisp
+(setq org-src-window-setup 'current-window)
+#+end_src
+
+*** Run code
+
+Run without confirmation
+
+#+begin_src emacs-lisp
+ (setq org-confirm-babel-evaluate nil)
+#+end_src
+
+Languages
+
+#+begin_src emacs-lisp
 (org-babel-do-load-languages
- 'org-babel-load-languages '(
-                             (emacs-lisp . t)
+ 'org-babel-load-languages '((emacs-lisp . t)
                              (shell . t)
                              (python . t)
-														 (js . t)
-                             ))
-;; Default headers
-;; Shell
+                             (js . t)))
+#+end_src
+
+Bash 
+
+#+begin_src emacs-lisp
 (setq org-babel-default-header-args:sh '((:results . "verbatim pp replace")))
-;; Use bash
 (setq explicit-shell-file-name "/bin/bash")
 (setq-default shell-file-name "bash")
 (setq explicit-bash-args '("-c" "export EMACS=; stty echo; bash"))
+#+end_src
 
-;; Python
+Python
+
+#+begin_src emacs-lisp
 (setq org-babel-python-command "python3")
 (setq org-babel-default-header-args:python '((:results . "verbatim pp replace output")))
-;; js
-(setq org-babel-default-header-args:js '((:results . "verbatim pp replace")))
+#+end_src
 
-#+END_SRC
+Inhert properties from above the tree
 
-Create blocks by completion, edit source blocks in the same window, evaluate them without confirmation
-Block completion works by pressing =<= the template key and =TAB= 
+#+begin_src emacs-lisp
+ (setq org-use-property-inheritance t)
+#+end_src
 
-#+BEGIN_SRC emacs-lisp 
-;; Completion templates
-(require 'org-tempo)
-(setq org-structure-template-alist '(
-				     ("s" . "src")
-				     ))
+** Org capture
 
-;; (setq org-structure-template-alist '(
-;;                                      ("n" "#+NAME: ?")
-;;                                      ("t" "#+TBLFM: ?")
-;;                                      ("s" "#+BEGIN_SRC ? \n?\n#+END_SRC")
-;;                                      ("e" "#+BEGIN_EXAMPLE \n?\n#+END_EXAMPLE")
-;;                                      ("q" "#+BEGIN_QUOTE \n?\n#+END_QUOTE")
-;;                                      ("v" "#+BEGIN_VERSE \n?\n#+END_VERSE")
-;;                                      ("V" "#+BEGIN_VERBATIM \n?\n#+END_VERBATIM")
-;;                                      ("c" "#+BEGIN_CENTER \n?\n#+END_CENTER")
-;;                                      ("l" "#+BEGIN_EXPORT latex \n?\n#+END_EXPORT")
-;;                                      ("L" "#+LaTeX: ")
-;;                                      ("h" "#+BEGIN_EXPORT html \n?\n#+END_EXPORT")
-;;                                      ("H" "#+HTML: ")
-;;                                      ("a" "#+BEGIN_EXPORT ascii \n?\n#+END_EXPORT")
-;;                                      ("A" "#+ASCII: ")
-;;                                      ("i" "#+INDEX: ?")
-;;                                      ("I" "#+INCLUDE: %file ?")
-                                     ;; ))
-;; Edit block in the same window
-(setq org-src-window-setup 'current-window)
-;; Evaluate without confirmation
-(setq org-confirm-babel-evaluate nil)
-;; Set header arguments inside property drawers and have these affect all nested blocks
-(setq org-use-property-inheritance t)
-
-#+END_SRC
-
-
-** Prose
-
-Simple visual and navigation tweaks
-
-#+BEGIN_SRC emacs-lisp 
-(setq org-hide-emphasis-markers t) ;; Hide markers
-(setq org-support-shift-select 'always) ;; Select with shift
-(setq org-return-follows-link t) ;; Follow links with Enter
-(setq browse-url-browser-function 'browse-url-xdg-open) ;; Open web links in Firefox
-(setq org-tags-column 0) ;; Tag positions
-
-#+END_SRC
-
-Italize or make bold easily
-
-#+BEGIN_SRC emacs-lisp 
-(defun orgbold ()
-  (interactive)
-  (org-emphasize ?*))
-
-(defun orgitalic ()
-  (interactive)
-  (org-emphasize ?/))
-
-(define-key org-mode-map [(shift return)] 'orgbold)
-
-
-#+END_SRC
-
-Easy to read text in example blocks
-
-#+BEGIN_SRC emacs-lisp 
-(defun m/read-easy-hook (modes)
-  (dolist (m/mode modes)
-    (add-hook m/mode (lambda ()
-		       (setq visual-line-mode t)))))
-
-  (m/read-easy-hook m/writing_modes)
-  (m/read-easy-hook '(fundamental-mode-hook))
-#+END_SRC
-
-** org-capture
-
-To receive text from Firefox I listen to messages through Emacs server and org-protocol, and process them through org-capture.
-
-Listen to messages
+Server
 
 #+BEGIN_SRC emacs-lisp 
 (server-start)
 (require 'org-protocol)
-
 #+END_SRC
 
-Put text in an ordered list inside a predefined document and heading, including its source, don't bother with editing or confirming afterwards
-
-#+BEGIN_SRC emacs-lisp 
-;; (defun m/capturewebclip ()
-;;   (let (
-;;         (m/clips "/home/m/auricio/write/clips/web.org")
-;;         )
-;;     (with-current-buffer (find-file-noselect m/clips)
-;;       (setq fragments
-;;             (org-map-entries
-;;              (lambda ()
-;;                (nth 4 (org-heading-components)))
-;;              "+fragment"
-;;              'file)))
-;;     (if (= (length fragments) 0)
-;;         (setq this-fragment "1")
-;;       (setq this-fragment (number-to-string (+ 1 (string-to-number (car (last fragments)))))))
-;;     (message this-fragment)
-;;     ))
-
-;; (setq org-capture-templates
-;;       '(
-				
-;; 				;; ("n"
-;;         ;;  "New"
-;;         ;;  entry
-;;         ;;  (file+headline
-;;         ;;   "/home/m/Dropbox/proyectos/lab/webclips.org"
-;;         ;;   "clips")
-;;         ;;  "\n\n\n* %:description\n[[%:link][⦿]]\n\n%i"
-;;         ;;  :immediate-finish t :jump-to-captured nil :empty-lines 1)
-				
-;; 				;; ("a"
-;;         ;;  "Append"
-;;         ;;  plain
-;;         ;;  (file
-;;         ;;   "/home/m/Dropbox/proyectos/lab/webclips.org")
-;;         ;;  "\n\n%i"
-;;         ;;  :immediate-finish t :jump-to-captured nil)
-
-;; 				("n"
-;; 				 "New note journal entry"
-;; 				 plain
-;; 				 (function m/journal-write-plain)
-;; 				 "* ☖ \n\n[[%:link][%:description]]\n\n#+BEGIN_QUOTE \n%i\n#+END_QUOTE \n\n"
-;; 				 :immediate-finish t :jump-to-captured nil :empty-lines 1)
-
-;; 				("a"
-;; 				 "New append note journal entry"
-;; 				 plain
-;; 				 (function m/journal-write-plain)
-;; 				 "\n\n#+BEGIN_QUOTE \n%i\n#+END_QUOTE \n\n"
-;; 				 :immediate-finish t :jump-to-captured nil :empty-lines 1)
-
-
-;; 				("k"
-;; 				 "New book journal entry"
-;; 				 plain
-;; 				 (function m/journal-capture-book)
-;; 				 "\n\n#+BEGIN_QUOTE \n%i\n#+END_QUOTE \n\n"
-;; 				 :immediate-finish t :jump-to-captured 1 :empty-lines 1)
-				
-;; 				;; ("b"
-;; 				;;        "Bookmark"
-;; 				;;        entry
-;; 				;;        (file
-;; 				;;         "/home/m/Dropbox/proyectos/lab/bookmarks.org")
-;; 				;;        "\n\n\n* %:description\n%:link\n"
-;; 				;;        :immediate-finish t :jump-to-captured nil :empty-lines 1)
-
-;; 				("b"
-;; 				 "Bookmark journal entry"
-;; 				 plain
-;; 				 (function m/journal-write-plain)
-;; 				 "* ☖ \n\n[[%:link][%:description]]\n\n"
-;; 				 :immediate-finish t :jump-to-captured nil :empty-lines 1)
-
-;; 				("m"
-;; 				 "Manual journal entry"
-;; 				 plain
-;; 				 (function m/journal-write-plain)
-;; 				 "%i\n"
-;; 				 :immediate-finish t :jump-to-captured nil :empty-lines 0)
-
-;; 				("l"
-;;          "Long"
-;;          entry
-;;          (file+headline
-;;           "/home/m/auricio/write/clips/web.org"
-;;           "Fragments")
-;;          "\n* %(m/capturewebclip) :fragment:\n %i\n%:link"
-;;          :immediate-finish t :jump-to-captured nil)
-				
-;; 				("s"
-;; 				 "Short"
-;; 				 plain
-;; 				 (file
-;; 					"/home/m/auricio/write/clips/diary.org")
-;; 				 "\n%i [[%:link][*]]"
-;; 				 :immediate-finish t :jump-to-captured nil)
-				
-;; 				))
-
-#+END_SRC
-
-I can't extend this process to taking notes from books. Books are usually distributed as PDFs and:
-1. I couldn't find a PDF reader I can have the Emacs server interact with
-2. Text from PDFs usually requires post-processing
-Therefore I decided to circunvent org-capture and just copy text with minimal automatic post-processing inside an ordered list in the current buffer.
-
-#+BEGIN_SRC emacs-lisp 
-;; Insert clipboard text inside the last heading in an ordered list, replace all line endings with spaces
-(defun m/capturepdf ()
-  (interactive)
-  (setq fragments
-        (org-map-entries
-         (lambda ()
-           (nth 4 (org-heading-components)))
-         "+fragment" 'tree))
-  (if (= (length fragments) 0)
-      (setq last-fragment "1")
-    (setq last-fragment
-          (number-to-string
-           (+ 1 
-              (string-to-number
-               (car (last fragments)))))))
-  (org-insert-heading-after-current)
-  (insert last-fragment)
-  (insert
-   "\n"
-   (replace-regexp-in-string
-    "\n" " "
-    (current-kill 0)))
-  (org-set-tags-to "fragment")
-  )
-;; Key
-(define-key org-mode-map (kbd "M-v") 'm/capturepdf)
-
-#+END_SRC
-
-
-** Find information across multiple org documents
-
-Define what documents are interesting
-
-#+BEGIN_SRC emacs-lisp 
-;; (setq m/interesting
-			
-;;       (list
-;;        "/home/m/auricio/write/clips/web.org"
-;;        "/home/m/auricio/write/clips/1.org"
-;;        "/home/m/auricio/write/writing/datos.org"
-;;        "/home/m/auricio/write/writing/procosi.org"
-;;        "/home/m/auricio/write/writing/internet.org"
-;;        "/home/m/auricio/write/writing/socialchoice.org"
-;;        "/home/m/auricio/write/writing/android.org"
-;;        "/home/m/auricio/write/read/notes/Hofstadter_Godel-Escher-Bach.org"
-;;        "/home/m/auricio/write/read/notes/Osterhammel-The_Transformation_of_the_World.org"
-;;        "/home/m/auricio/write/read/notes/Pinker_Enlightenment_Now.org"
-;;        "/home/m/auricio/write/read/notes/read.org"))
-
-#+END_SRC
-
-Full text search 
-
-#+BEGIN_SRC emacs-lisp 
-;; Setup org-rifle
-(require 'helm-org-rifle)
-;; What files to search
-(defun m/riflesearch()
-  (interactive)
-  (helm-org-rifle-files m/interesting))
-;; Key to search
-(global-set-key (kbd "C-x /") 'm/riflesearch)
-
-#+END_SRC
-
-Search only headings
-
-#+BEGIN_SRC emacs-lisp 
-;; (setq org-agenda-files m/interesting)
-;; (global-set-key (kbd "M-/") 'helm-org-agenda-files-headings)
-
-#+END_SRC
-
-** Store and use citations
-:PROPERTIES:
-:header-args: :tangle no
-:END:
-
-Disabled because I don't use it and it runs timers constantly
-
-Where to store citations
-
-#+BEGIN_SRC emacs-lisp 
-(require 'org-ref)
-(setq bibtex-completion-bibliography "~/auricio/write/writing/bib/ref.bib"
-      bibtex-completion-library-path "~/auricio/write/writing/bib/ref.bib"
-      bibtex-completion-notes-path "~/auricio/write/writing/bib/helm-bibtex-notes"
-      reftex-default-bibliography '("~/auricio/write/writing/bib/ref.bib")
-      org-ref-bibliography-notes "~/auricio/write/writing/bib/notes.org"
-      org-ref-default-bibliography '("~/auricio/write/writing/bib/ref.bib")
-      org-ref-pdf-directory "~/auricio/write/read/bib/")
-
-#+END_SRC
-
-Store citations with =C-c C-b= inside the Bibtex document
-Copy references to citations with =helm-bibtex=
-
-#+BEGIN_SRC emacs-lisp 
-;; Modify helm-source-bibtex so that copying references is the default option
-(setq helm-source-bibtex
-      (helm-build-sync-source "BibTeX entries"
-	:header-name (lambda (name)
-		       (format "%s%s: " name (if helm-bibtex-local-bib " (local)" "")))
-	:candidates 'helm-bibtex-candidates
-	:filtered-candidate-transformer 'helm-bibtex-candidates-formatter
-	:action (helm-make-actions
-		 "Insert reference"           'helm-bibtex-insert-reference
-		 "Open PDF, URL or DOI"       'helm-bibtex-open-any
-		 "Open URL or DOI in browser" 'helm-bibtex-open-url-or-doi
-		 "Insert citation"            'helm-bibtex-insert-citation
-		 "Insert BibTeX key"          'helm-bibtex-insert-key
-		 "Insert BibTeX entry"        'helm-bibtex-insert-bibtex
-		 "Attach PDF to email"        'helm-bibtex-add-PDF-attachment
-		 "Edit notes"                 'helm-bibtex-edit-notes
-		 "Show entry"                 'helm-bibtex-show-entry
-		 "Add PDF to library"         'helm-bibtex-add-pdf-to-library)))
-
-#+END_SRC
-
-Modify =bibtex-completion-insert-reference= so that references are not broken into multiple lines
-
-#+BEGIN_SRC emacs-lisp 
-(defun bibtex-completion-insert-reference (keys)
-  "Insert a reference for each selected entry."
-  (let* ((refs (--map
-		(concat "\n- " (bibtex-completion-apa-format-reference it))
-                keys)))
-    (insert (replace-regexp-in-string "\n" "" (s-join "" refs)))))
-
-#+END_SRC
-
-
-** Journal
-
-Book I am reading now
-
-#+BEGIN_SRC emacs-lisp 
-;; ;; (setq m/journalbook "Bostrom-TheVulnerableWorldHypothesis")
-;; (defvar m/journalbook)
-;; (add-to-list 'desktop-globals-to-save 'm/journalbook)
-
-;; (defun m/journal-new-book ()
-;; 	(interactive)
-;; 	(setq m/journalbook (read-string "A filepath for the book:"))
-;; 	)
-
-;; (defun m/journal-capture-book ()
-;; 	(interactive)
-;; 	(if (equal m/journalbook "")
-;; 			(m/journal-write-plain)
-;; 		(m/journal-write-book))
-;; 	)
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp 
-;; ;; (require 'org-journal)
-;; ;; (setq org-journal-dir "~/auricio/lab/journal/")
-
-;; ;; insert time
-;; (defun m/time ()
-;; 	"Insert time"
-;; 	(interactive)
-;; 	(insert
-;; 	 (concat 
-;; 		(format-time-string "%H:%M")
-;; 		"  ")
-;; 	 ))
-
-;; (defun m/journal-time ()
-;; 	(format-time-string "%H:%M")
-;; 	)
-
-;; (setq m/dominiopublico-dir "~/auricio/lab/oratorio/dominiopublico/")
-
-;; (setq m/journal-dir "~/auricio/landscape/practice/")
-;; (setq m/journal-note "%Y-%m")
-;; (setq m/journal-entry "%e")
-
-;; (defun m/journal-find-note ()
-;; 	(concat
-;; 	 m/journal-dir
-;; 	 (format-time-string m/journal-note)
-;; 	 ".org"
-;; 	 ))
-
-;; (defun m/journal-find-entry ()
-;; 	(format-time-string m/journal-entry))
-
-;; (defun m/journal-create-note ()
-;; 	(interactive)
-;; 	(defconst journal-note (m/journal-find-note))
-;; 	(unless (file-exists-p journal-note)
-;; 		(write-region "" nil journal-note)))
-
-;; (defun m/journal-create-entry ()
-;; 	(interactive)
-;; 	(defconst today (m/journal-find-entry))
-;; 	(insert (concat "* " today)))
-
-;; (defun m/journal-write-plain ()
-;; 	(interactive)
-;; 	(defconst journal-note (m/journal-find-note))
-;; 	(find-file journal-note)
-;; 	(goto-char (point-max))
-;; )
-
-;; (setq m/journalbookdirectory "~/auricio/lab/textos/")
-
-;; (defun m/journal-write-book ()
-;; 	(interactive)
-;; 	(defconst journal-note (concat m/journalbookdirectory m/journalbook ".org"))
-;; 	(find-file journal-note)
-;; 	(goto-char (point-max))
-;; )
-
-;; (defun m/journal-write ()
-;; 	(interactive)
-;; 	(defconst journal-note (m/journal-find-note))
-;; 	(defconst now (format-time-string "%H:%M"))
-;; 	(find-file journal-note)
-;; 	(goto-char (point-max))
-;; 	(insert (concat "** " now "\n\n"))
-;; 	(goto-char (point-max))
-;; )
-
-;; (global-set-key (kbd "C-x C-j") 'm/journal-write)
-
-;; (setq m/textos-dir "~/auricio/lab/textos/")
-
-;; (setq org-agenda-files
-;; 			(append
-;; 			 (directory-files m/journal-dir t ".*\.org")
-;; 			 (directory-files m/dominiopublico-dir t ".*\.org")
-;; 			 (directory-files m/textos-dir t ".*\.org")))
-
-;; ;; Search journal entries
-;; (defun m/journal ()
-;; 	"Search journal entries"
-;; 	(interactive)
-;; 	(helm-do-ag "~/auricio/lab/")
-;; 	)
-;; (global-set-key (kbd "C-M-/") 'm/journal)
-;; (setq helm-follow-mode-persistent 1)
-
-;; ;; (global-set-key (kbd "M-/") 'org-tags-view)
-
-;; ;; ;; (setq org-journal-file-pattern "~/auricio/write/proyectos/lab/lab/journal/^[^\.][^#][[:alnum:]]+\.org$")
-;; ;; (setq org-journal-file-format "%Y%m%d.org")
-;; ;; ;; (setq org-journal-date-format "%x")
-
-;; ;; (defun org-journal-find-location ()
-;; ;;   (org-journal-new-entry t)
-;; ;; 	)
-
-;; ;; (setq org-agenda-directory org-journal-dir)
-;; ;; (setq org-agenda-files (directory-files (expand-file-name org-agenda-directory) t 
-;; ;; "^[^\.][^#][[:alnum:]]+\.org$"))
-
-;; ;; (setq org-journal-enable-agenda-integration t)
-#+END_SRC
-
-** Landscape
-
-*** Current
-
-Captures go into the heading at point. Press =C-.= to change the target heading
-
-#+BEGIN_SRC emacs-lisp 
-
-(defvar m/capture-file '()) ;; What file to capture into
-(defvar m/capture-persist "~/.emacs.d/.capture") ;; Where m/capture-file is stored across sessions
-
-(defun m/capture-point ()
-	"Go to m/capture-file and place the cursor at the bottom"
-	(interactive)
-	(find-file (nth 0 m/capture-file))
-	(org-goto-marker-or-bmk (org-find-exact-headline-in-buffer (nth 1 m/capture-file)))
-	(outline-next-heading)
-	(newline)
-	(left-char)
-	)
-
-(defun m/capture-here ()
-	"Select a file and heading to write captures to."
-	(interactive)
-	(let ((m/capture-here-file (buffer-file-name (org-base-buffer (nth 0 (org-buffer-list "files")))))
-				(m/capture-here-heading (substring-no-properties (org-get-heading))))
-		(setq m/capture-file (list m/capture-here-file m/capture-here-heading))
-		(message (concat m/capture-here-file " --> " m/capture-here-heading))
-		))
-
-(setq org-capture-templates
-			'(
-				("l"
-				 "Capture a link"
-				 plain
-				 (function m/capture-point)
-				 "\n\n[[%:link][%:description]]\n\n"
-				 :immediate-finish t :jump-to-captured nil :empty-lines 1)
-				("q"
-				 "Capture a quote"
-				 plain
-				 (function m/capture-point)
-				 "/%:initial/"
-				 :immediate-finish t :jump-to-captured nil :empty-lines 1)
-				))
-
-(global-set-key (kbd "C-.") 'm/capture-here)
-#+END_SRC
-
-
-Search tags, headings or fulltext inside these files.
-
-#+BEGIN_SRC emacs-lisp 
-(defun m/agendafiles ()
-		(interactive)
-	(setq org-agenda-files (directory-files-recursively "~/studio/" ".*\.org")))
-(setq org-agenda-files (directory-files-recursively "~/studio" ".*\.org"))
-(defun m/find-interesting ()
-	"Find interesting stuff you've captured previously"
-	(interactive)
-	(defconst m/find-interesting-mode	(completing-read "Find: " '("Tags" "Headings" "Full Text")))
-	(cond ((string-equal m/find-interesting-mode "Tags") (m/org-tags-view))
-				((string-equal m/find-interesting-mode "Headings") (helm-org-agenda-files-headings))
-				((string-equal m/find-interesting-mode "Full Text") (helm-do-ag "~/studio/" org-agenda-files))))
-(global-set-key (kbd "C-M-/") 'm/find-interesting)
-#+END_SRC
-
-
-*** Previously
-:PROPERTIES:
-:header-args: :tangle no
-:END:
-
-
-Settings for org-capture templates. Captures can write to 
-1. A /practice/ file, named after the current week number, stored at =~/auricio/landscape/practice/= and found dinamically via =m/practice-file=
-2. A /product/ file, selected manually from files inside =~/auricio/landscape/product/=
-A user selects which file to capture to via =m/capture-here=, an interactive function. This selection is stored at =m/capture-persist= in order to work across sessions.
-Captures insert links =l= or quotes =q= and finish without editing. I expect captures to be useful  just to grab text from outside, while I give structure to notes manually. 
-
-#+BEGIN_SRC emacs-lisp 
-(defvar m/capture-file nil) ;; What file to capture into
-(defvar m/capture-persist "~/.emacs.d/.capture") ;; Where m/capture-file is stored across sessions
-
-(defun m/capture-point ()
-	"Go to m/capture-file and place the cursor at the bottom"
-	(interactive)
-  (find-file m/capture-file)
-	(goto-char (- (point-max) 1))
-	)
-
-;; Previously I had a default capture file for every week. As many of their contents ended up refiled elsewhere, these files were mostly empty. I'll try using only one file now.
-
-;; (defun m/practice-file ()
-;; 	"Select the practice file for captures."
-;; 	(defconst practice-file (concat "~/auricio/landscape/practice/" (format-time-string "%W") ".org"))
-;; 	(unless (file-exists-p practice-file) (write-region "" nil practice-file))
-;; 	(message practice-file)
-;; 	)
-
-(defun m/practice-file ()
-	"Select the practice file for captures."
-	(message "~/auricio/landscape/practice/practice.org")
-	)
-
-(defun m/load-capture-persist ()
-	"Read the m/capture-persist file and assign its value to m/capture-file, unless it's value is 'practice', in which case assign dynamically m/practice-file "
-	(defconst m/capture-persist-content (m/read-file-content m/capture-persist))
-	(if (string-equal m/capture-persist-content "practice")
-			(setq m/capture-file (m/practice-file))
-		(setq m/capture-file m/capture-persist-content))
-	)
-
-(defun m/read-file-content (file-path)
-  "Return file-path's content."
-  (with-temp-buffer
-    (insert-file-contents file-path)
-    (buffer-substring (point-min) (line-end-position))))
-
-(defun m/capture-here ()
-	"Select a file to write captures to."
-	(interactive)
-	(defconst m/capture-mode	(completing-read "Select: " '("practice" "product")))
-	(message m/capture-mode)
-	(if (string-equal m/capture-mode "practice")
-			(and (setq m/capture-file (m/practice-file))
-					 (write-region "practice" nil m/capture-persist)
-					 (message "Practice"))
-		(and (setq m/capture-file (read-file-name "Select:" "~/auricio/landscape/product/"))
-				 (write-region m/capture-file nil m/capture-persist)
-				 (message "Product"))
-		))
-
-(setq org-capture-templates
-			'(
-				("l"
-				 "Capture a link"
-				 plain
-				 (function m/capture-point)
-				 "\n\n[[%:link][%:description]]\n\n"
-				 :immediate-finish t :jump-to-captured nil :empty-lines 1)
-				("q"
-				 "Capture a quote"
-				 plain
-				 (function m/capture-point)
-				 "\n\n#+BEGIN_QUOTE \n%:initial\n#+END_QUOTE \n\n"
-				 :immediate-finish t :jump-to-captured nil :empty-lines 1)
-				))
-
-(global-set-key (kbd "C-.") 'm/capture-here)
-(m/load-capture-persist)
-#+END_SRC
-
-Search tags, headings or fulltext inside these files.
-
-#+BEGIN_SRC emacs-lisp 
-(defun m/agendafiles ()
-		(interactive)
-	(setq org-agenda-files (directory-files-recursively "~/studio/" ".*\.org")))
-(setq org-agenda-files (directory-files-recursively "~/studio" ".*\.org"))
-(defun m/find-interesting ()
-	"Find interesting stuff you've captured previously"
-	(interactive)
-	(defconst m/find-interesting-mode	(completing-read "Find: " '("Tags" "Headings" "Full Text")))
-	(cond ((string-equal m/find-interesting-mode "Tags") (m/org-tags-view))
-				((string-equal m/find-interesting-mode "Headings") (helm-org-agenda-files-headings))
-				((string-equal m/find-interesting-mode "Full Text") (helm-do-ag "~/auricio/landscape/" org-agenda-files))))
-(global-set-key (kbd "C-M-/") 'm/find-interesting)
-#+END_SRC
-
-*** Some reading helpers
-
-I create entries for papers I read or want to read. Each of these can be pointed by a DOI. I want a function that takes a DOI, borrowed from a custom =doi= property, and takes me to the article page, the sci-hub page or inserts a citation in place.
-
-#+BEGIN_SRC emacs-lisp 
-(defun m/doi ()
-	(interactive)
-	(let ((m/doi-value (org-entry-get nil "doi"))
-				(m/doi-action (completing-read "Select: " '("Article" "Sci-Hub" "Citation"))))
-		(if (string-equal m/doi-action "Article")
-				(browse-url (concat "https://doi.org/" m/doi-value)))
-		(if (string-equal m/doi-action "Sci-Hub")
-				(browse-url (concat "http://sci-hub.tw/" m/doi-value)))
-		(if (string-equal m/doi-action "Citation")
-				(let ((m/doi-citation  (shell-command-to-string (concat "curl -s -LH 'Accept: text/bibliography; style=bibtex' http://dx.doi.org/" m/doi-value))))
-					(insert (concat "#+BEGIN_SRC bibtex\n" m/doi-citation "\n#+END_SRC"))))
-		))
-#+END_SRC
-
-** Export
-
-Variables
-
-#+BEGIN_SRC emacs-lisp 
-(setq-default org-export-preserve-breaks t)
-(setq-default org-export-with-toc nil)
-(setq-default org-export-with-title nil)
-(setq-default org-export-with-author nil)
-(setq-default org-export-time-stamp-file nil)
-(setq-default org-export-with-title nil)
-(setq-default org-export-with-section-numbers nil)
-(setq-default org-html-validation-link nil)
-#+END_SRC
-
-HTML head
-
-#+NAME: charter-regular
-#+BEGIN_SRC css 
-src: url(data:application/x-font-woff;charset=utf-8;base64,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)
-#+END_SRC
-
-#+BEGIN_SRC css :tangle org.css :noweb yes
-@font-face {
-  font-family: 'charterregular';
-	<<charter-regular>>;
-  font-weight: normal;
-  font-style: normal;
-}
-
-html {
-	background-color: #f9f9f9;
-}
-
-body {
-	margin: 0px 120px;
-	font-family: charterregular;
-	background-color: #fbfbfb;
-	color: #171718;
-	padding: 10px 30px;
-}
-
-h1, h2 {
-	padding: 10px 0px 25px 0px;
-	border-bottom: 1px solid #f0f0f8;
-}
-
-p {
-	margin: 7px 0px;
-}
-
-blockquote {
-	font-size: 0.8rem;
-	color: #8d83a5;
-	background: #f9f9ff;
-	padding: 5px 16px;
-	border-radius: 5px;
-	border: 1px solid #e8e1ff;
-}
-
-blockquote p {
-	white-space: pre-wrap;
-}
-
-p + blockquote, blockquote + p {
-	margin-top: 25px;
-}
-
-li {
-	margin: 2px 0px;
-	font-size: 0.8rem;
-}
-
-@media (max-width: 760px) {
-	body {
-		padding: 10px 20px;
-	}
-
-	blockquote {
-		margin: 10px 15px;
-	}
-}
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp
-(setq org-html-head "<meta http-equiv='Content-Type' content='text/html;charset=utf-8'/> \ 
-			<meta name='viewport' content='width=device-width, initial-scale=1' /> \ 
-<link rel='stylesheet' type='text/css' href='/home/m/auricio/boot/emacs/org.css'/>")
-#+END_SRC
-
-** Agenda
-
-#+BEGIN_SRC emacs-lisp 
-(setq org-agenda-tags-column 1)
-(setq org-agenda-follow-indirect t)
-
-(setq org-super-agenda-groups
-			'((:name "Tareas" :tag "tarea")))
-
-(require 'org-super-agenda)
-(defun m/org-tags-view ()
-	(interactive)
-	(org-tags-view nil "tarea"))
-
-	;; (let ((org-super-agenda-groups
-	;;        '((:name "Tareas" :tag "tarea"))
-	;;        ))
-	;; 	(org-tags-view nil "tarea"))
-#+END_SRC
-
-** Personal workflow
-
-I try to make progress on certain life projects, which are contained inside org files within a directory. Each of these projects has a purpose, status, history. I want to narrow the funcionality of Emacs to specialize in working on these projects. For this, I'll maintain an org file (index) where I'll write information about each project. To keep this file at hand, I'll turn it into a sidebar I can open at any moment. 
+Select interactively where to place captures: just =C-.= where you want them to go
 
 #+begin_src emacs-lisp
-(defun m/showindex ()
-  "Show the index of current projects"
-  (let ((buffer (get-file-buffer "/home/m/studio/index.org")))
-    (progn
-    (display-buffer-in-side-window buffer '((side . left) (window-width . 0.2)))
-    (set-window-dedicated-p (get-buffer-window buffer) t)
-    )))
+ (defvar m/capture-file '())
+ (defvar m/capture-persist "~/.emacs.d/.capture")
 
-(defun m/hideindex ()
-  "Hide the index of current projects"
-  (let ((buffer (get-file-buffer "/home/m/studio/index.org")))
-    (progn
-    (delete-window (get-buffer-window buffer))
-    )))
+ (defun m/goto-capture ()
+   "Go to m/capture-file and place the cursor at the bottom"
+   (interactive)
+   (find-file (nth 0 m/capture-file))
+   (org-goto-marker-or-bmk (org-find-exact-headline-in-buffer (nth 1 m/capture-file)))
+   (outline-next-heading)
+   (newline)
+   (left-char)
+   )
 
-(defun m/toggleindex ()
-  "Toggle the index of current projects"
-  (interactive)
-  (let* ((buffer (get-file-buffer "/home/m/studio/index.org"))
-	(window (get-buffer-window buffer)))
-    (if window
-	(m/hideindex)
-      (m/showindex)
-      )))
+ (defun m/capture-here ()
+   "Select a file and heading to write captures to."
+   (interactive)
+   (let ((m/capture-here-file (buffer-file-name (org-base-buffer (nth 0 (org-buffer-list "files")))))
+         (m/capture-here-heading (substring-no-properties (org-get-heading))))
+     (setq m/capture-file (list m/capture-here-file m/capture-here-heading))
+     (message (concat m/capture-here-file " --> " m/capture-here-heading))
+     ))
 
-(global-set-key (kbd "C-M-SPC") 'm/toggleindex)
+ (global-set-key (kbd "C-.") 'm/capture-here)
 #+end_src
 
-* Dired
+Format captures as links or quotes
 
+#+begin_src emacs-lisp
+ (setq org-capture-templates
+       '(
+         ("l"
+          "Capture a link"
+          plain
+          (function m/goto-capture)
+          "\n\n[[%:link][%:description]]\n\n"
+          :immediate-finish t :jump-to-captured nil :empty-lines 1)
+         ("q"
+          "Capture a quote"
+          plain
+          (function m/goto-capture)
+          "/%:initial/"
+          :immediate-finish t :jump-to-captured nil :empty-lines 1)
+         ))
+#+end_src
+
+** Sidebar
+
+A sidebar I can bring at any moment that displays useful information.
+
+Visual changes to apply so that it looks different 
+
+#+begin_src emacs-lisp
+ (defun m/index-faces ()
+   (setq header-line-format nil)
+   (face-remap-add-relative 'default '(:background "#f8f7fa" :foreground "#aba1a2"))
+   (face-remap-add-relative 'org-level-1 '(:foreground "#756a6b"))
+   (face-remap-add-relative 'org-hide '(:background "#f8f7fa"))
+   (face-remap-add-relative 'org-agenda-filter-tags '(:background "#f8f7fa" :foreground "#ff6678") :box '(:line-width 5 :color "#f8f7fa"))
+   (face-remap-add-relative 'org-block-begin-line '(:background "#f8f7fa"))
+   (face-remap-add-relative 'org-block-end-line '(:background "#f8f7fa"))
+   (face-remap-add-relative 'org-block '(:background "#f3f2f5"))
+   )
+#+end_src
+
+Easily toggle from anywhere
+
+#+begin_src emacs-lisp
+ (defun m/showindex ()
+   "Show the index of current projects"
+   (let ((buffer (get-file-buffer m/sidebar)))
+     (progn
+       (display-buffer-in-side-window buffer '((side . left) (window-width . 0.25)))
+       (set-window-dedicated-p (get-buffer-window buffer) t)
+       (select-window (get-buffer-window buffer))
+       (m/index-faces)
+       )))
+
+ (defun m/hideindex ()
+   "Hide the index of current projects"
+   (let ((buffer (get-file-buffer m/sidebar)))
+     (progn
+       (delete-window (get-buffer-window buffer))
+       )))
+
+ (defun m/toggleindex ()
+   "Toggle the index of current projects"
+   (interactive)
+   (let* ((buffer (get-file-buffer m/sidebar))
+          (window (get-buffer-window buffer)))
+     (if window
+         (m/hideindex)
+       (m/showindex)
+       )))
+
+ (global-set-key (kbd "C-M-SPC") 'm/toggleindex)
+#+end_src
+
+* Other
+** Interactive
+
+#+BEGIN_SRC emacs-lisp 
+(define-key global-map (kbd "M-x") 'helm-M-x)
+#+END_SRC
+
+** Dired
 
 Open in current directory
 
@@ -1691,58 +1043,6 @@ Display a simple list
 (require 'dired-details)
 (dired-details-install)
 (setq dired-details-hidden-string "")
-
-#+END_SRC
-
-Sort directories first
-
-#+BEGIN_SRC emacs-lisp 
-(setq dired-listing-switches "-al --group-directories-first")
-
-#+END_SRC
-
-Go up and down the filesystem
-
-#+BEGIN_SRC emacs-lisp 
-;; (define-key dired-mode-map (kbd "M-<left>")
-;;   (lambda ()
-;;     (interactive)
-;;     (find-alternate-file "..")))
-;; (define-key dired-mode-map (kbd "M-<right>") 'dired-find-alternate-file)
-
-#+END_SRC
-
-Delete directories without confirmation
-
-#+BEGIN_SRC emacs-lisp 
-(setq dired-recursive-deletes 'always)
-
-#+END_SRC
-
-Default external applications
-
-#+BEGIN_SRC emacs-lisp 
-(require 'openwith)
-(setq openwith-associations '(
-                              ("\\.pdf\\'" "evince" (file))
-                              ("\\.jpg\\'" "feh" (file))
-			      ("\\.png\\'" "feh" (file))
-			      ("\\.jpeg\\'" "feh" (file))
-                              ("\\.djvu\\'" "evince" (file))))
-(openwith-mode t)
-;; Necessary to display images in org-mode if openwith is activated
-(defadvice org-display-inline-images
-    (around handle-openwith
-            (&optional include-linked refresh beg end) activate compile)
-  (if openwith-mode
-      (progn
-        (openwith-mode -1)
-        ad-do-it
-        (openwith-mode 1))
-    ad-do-it))
-;; Open EPUBs inside Emacs
-(add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
-
 #+END_SRC
 
 Show icons
@@ -1751,7 +1051,7 @@ Show icons
 (add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
 #+END_SRC
 
-Keys to search and go up/down the filesystem
+Browse up, down and within directory levels
 
 #+BEGIN_SRC  emacs-lisp 
 (defun m/dired-go-up ()
@@ -1767,451 +1067,32 @@ Keys to search and go up/down the filesystem
 (define-key helm-find-files-map (kbd "M-<right>") 'helm-ff-RET)
 #+END_SRC
 
-
-* Programming
-
-Rainbow delimiters are convenient to locate yourself inside a nested structure, I find them useful in most modes
+Sort directories first
 
 #+BEGIN_SRC emacs-lisp 
-;; What modes
-(setq m/rainbow_modes
-      (append
-       m/programming_modes
-       '(pollen-mode-hook
-         lisp-interaction-mode-hook)))
-;; Apply
-(defun m/rainbow (modes)
-  (dolist (m/mode modes)
-    (add-hook m/mode #'rainbow-delimiters-mode)))
-(m/rainbow m/rainbow_modes)
+(setq dired-listing-switches "-al --group-directories-first")
 #+END_SRC
 
-Setup auto-complete
+Delete directories without confirmation
 
 #+BEGIN_SRC emacs-lisp 
-(ac-config-default)
-(setq ac-auto-start nil)
-(define-key ac-mode-map (kbd "M-TAB") 'auto-complete)
+(setq dired-recursive-deletes 'always)
 #+END_SRC
 
-Search all files within a directory. Press =C-c C-f= to go directly to results under the cursor (helm-follow-mode)
-
-#+BEGIN_SRC emacs-lisp :results silent
-(require 'ag)
-(global-set-key (kbd "M-.") 'helm-do-ag)
-#+END_SRC
-
-In javascript, use js2-mode with eslint if possible
+Apply default application selections and work around a bug that affects inline image display in org-mode.
 
 #+BEGIN_SRC emacs-lisp 
-;; Use js2
-(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
-;; Clean display
-(setq-default js-indent-level 2)
-(setq-default js2-basic-indent 2)
-(setq-default js2-basic-offset 2)
-(setq-default js2-auto-indent-p t)
-(setq-default js2-cleanup-whitespace t)
-(setq-default js2-indent-on-enter-key t)
-(setq js2-mode-show-parse-errors nil)
-(setq js2-mode-show-strict-warnings nil)
-;; Use eslint if found in node_modules
-(defun m/js2eslint ()
-  (let* ((root (locate-dominating-file
-                (or (buffer-file-name) default-directory)
-                "node_modules"))
-         (eslint (and root
-                      (expand-file-name "node_modules/eslint/bin/eslint.js"
-                                        root))))
-    (when (and eslint (file-executable-p eslint))
-      (setq-local flycheck-javascript-eslint-executable eslint))))
-(add-hook 'flycheck-mode-hook #'m/js2eslint)
-;; Simple comments
-(defun m/js2comments ()
-  (setq comment-start "//"
-        comment-end ""
-        comment-style 'indent))
-(add-hook 'js2-mode-hook #'m/js2comments)
-
+ (openwith-mode t)
+ (defadvice org-display-inline-images
+     (around handle-openwith
+             (&optional include-linked refresh beg end) activate compile)
+   (if openwith-mode
+       (progn
+         (openwith-mode -1)
+         ad-do-it
+         (openwith-mode 1))
+     ad-do-it))
 #+END_SRC
-
-python elpy
-
-#+BEGIN_SRC emacs-lisp 
-(setq-default elpy-rpc-python-command "python3")
-;; (elpy-enable)
-(setq-default python-shell-interpreter "python3")
-#+END_SRC
-
-* Unused
-:PROPERTIES:
-:header-args: :tangle no
-:END:
-
-** copy to emacs.d on save
-
-
-#+BEGIN_SRC emacs-lisp :results silent
-(defun i3-org-save()
-  (when (string= buffer-file-name "/home/m/auricio/boot/i3/config")
-    (copy-file "/home/m/auricio/boot/i3/config" "/home/m/.i3/" t)
-    (message "Copied to /home/m/.i3/ directory")))
-(add-hook 'after-save-hook 'i3-org-save)
-#+END_SRC
-
-
-** toggle dedicated windows
-:PROPERTIES:
-:ID:       69082d6f-2093-49bd-8890-1ac7ff14eda6
-:END:
-
-#+BEGIN_SRC emacs-lisp
-  (setq pop-up-windows t)
-
-  (defadvice pop-to-buffer (before cancel-other-window first)
-    (ad-set-arg 1 nil))
-
-  (defun toggle-window-dedicated ()
-    "Toggle whether the current active window is dedicated or not"
-    (interactive)
-    (message
-     (if (let (window (get-buffer-window (current-buffer)))
-           (set-window-dedicated-p window 
-                                   (not (window-dedicated-p window))))
-         "Window '%s' is dedicated"
-       "Window '%s' is normal")
-     (current-buffer)))
-
-  (global-set-key (kbd "s-p") 'toggle-window-dedicated)
-#+END_SRC
-
-
-** bash in shell-mode
-:PROPERTIES:
-:ID:       75c60900-d91a-4fee-839e-400044fa806d
-:END:
-
-#+BEGIN_SRC emacs-lisp
-  (setq explicit-shell-file-name "/bin/bash")
-  (setq-default shell-file-name "bash")
-  (setq explicit-bash-args '("-c" "export EMACS=; stty echo; bash"))
-#+END_SRC
-
-
-
-** move across shell prompts
-:PROPERTIES:
-:ID:       1b45f791-115f-467f-912b-52be1553c87c
-:END:
-
-#+BEGIN_SRC emacs-lisp
-  (defun shell-up()
-    (interactive)
-    (comint-previous-prompt 1))
-
-  (defun shell-down()
-    (interactive)
-    (comint-next-prompt 1))
-
-  (add-hook 'shell-mode-hook
-            (lambda ()
-              (define-key shell-mode-map (kbd "C-S-<up>") 'shell-up) 
-              (define-key shell-mode-map (kbd "C-S-<down>") 'shell-down)
-              ))
-#+END_SRC
-
-
-** reduce noise in shell
-:PROPERTIES:
-:ID:       d1cef454-64f9-41ff-b942-c2aaf5428663
-:END:
-
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'shell-mode-hook
-            (lambda ()
-              (setq comint-process-echoes t)
-              (setq initial-scratch-message nil)
-              ))
-#+END_SRC
-
-
-** show manpages in same window
-
-#+BEGIN_SRC emacs-lisp
-  (setq Man-notify-method 'pushy)
-#+END_SRC
-
-
-** check org heading id consistency
-:PROPERTIES:
-:ID:       b18dd4cd-9cb9-4436-b5c0-9c4696b9865a
-:END:
-
-#+BEGIN_SRC emacs-lisp
-  ;; (require 'org-id)
-  ;; (setq org-id-link-to-org-use-id t)
-  ;; (org-id-update-id-locations)
-#+END_SRC
-
-
-** automatically id new org headings
-:PROPERTIES:
-:ID:       389f5438-224d-4edc-b052-4f7ced9a159d
-:END:
-
-#+BEGIN_SRC emacs-lisp
-  ;; (defun mau/org-insert-heading-hook ()
-  ;;   (interactive)
-  ;;   (org-id-get-create)
-  ;;   (forward-char 1)
-  ;;   (org-cycle)
-  ;;   (backward-char 1))
-
-  ;; (add-hook 'org-insert-heading-hook 'mau/org-insert-heading-hook)
-  ;; (add-hook 'org-capture-before-finalize-hook 'mau/org-insert-heading-hook)
-#+END_SRC
-
-
-** epubs
-
-
-#+BEGIN_SRC emacs-lisp :results silent 
-  (add-hook 'nov-mode-hook
-            (lambda ()
-              (define-key nov-mode-map (kbd "<end>") 'move-end-of-line)
-              (define-key nov-mode-map (kbd "<home>") 'move-beginning-of-line)
-              ))
-#+END_SRC
-
-
-** org-ref
-
-#+BEGIN_SRC emacs-lisp 
-(setq org-ref-bibliography-notes "~/auricio/write/writing/bib/notes.org"
-      org-ref-default-bibliography '("~/auricio/write/writing/bib/ref.bib")
-      org-ref-pdf-directory "~/auricio/write/read/bib/")
-#+END_SRC
-
-#+RESULTS:
-: ~/auricio/write/read/bib/
-
-#+BEGIN_SRC emacs-lisp :results silent
-;; Basic paths
-(setq reftex-default-bibliography '("~/auricio/write/writing/bib/ref.bib"))
-(setq org-ref-bibliography-notes "~/auricio/write/writing/bib/notes.org"
-      org-ref-default-bibliography '("~/auricio/write/writing/bib/ref.bib")
-      org-ref-pdf-directory "~/auricio/write/read/bib/")
-;; Helm
-(setq bibtex-completion-bibliography "~/auricio/write/writing/bib/ref.bib"
-      bibtex-completion-library-path "~/auricio/write/writing/bib/ref.bib"
-      bibtex-completion-notes-path "~/auricio/write/writing/bib/helm-bibtex-notes")
-;; Open PDFs
-(setq bibtex-completion-pdf-open-function 'org-open-file)
-(require 'org-ref)
-#+END_SRC
-
-
-** org enhancements
-
-#+BEGIN_SRC emacs-lisp 
-(defun mau/date ()
-  (interactive)
-  (format-time-string "%d.%m.%Y")
-  )
-#+END_SRC
-
-
-** org refile
-:PROPERTIES:
-:ID:       1d39c472-396a-4ee5-82c8-ebdb8e5678e3
-:END:
-
-#+BEGIN_SRC emacs-lisp
-     ;; (setq org-refile-targets
-     ;;     '(
-     ;;      (org-agenda-files :maxlevel . 9)))
-#+END_SRC
-
-
-** html setup
-:PROPERTIES:
-:ID:       9af304f4-796a-463a-a760-ac0405e5142d
-:END:
-
-#+BEGIN_SRC emacs-lisp
-  (defun setup-for-ac-html ()
-    (require 'ac-html)
-    (require 'ac-html-default-data-provider)
-    (ac-html-enable-data-provider 'ac-html-default-data-provider)
-    (ac-html-setup)
-    (setq ac-sources '(ac-source-html-tag
-                       ac-source-html-attr
-                       ac-source-html-attrv))
-    (auto-complete-mode))
-
-  (add-hook 'html-mode-hook 'setup-for-ac-html)
-#+END_SRC
-
-
-** org export
-
-#+BEGIN_SRC emacs-lisp :results silent
-(require 'ox-tufte)
-(setq-default org-export-preserve-breaks t)
-(setq-default org-export-with-toc nil)
-(setq-default org-export-with-title nil)
-(setq-default org-export-with-author nil)
-(setq-default org-export-time-stamp-file nil)
-(setq-default org-export-with-title nil)
-(setq-default org-export-with-section-numbers nil)
-(setq-default org-html-validation-link nil)
-
-(with-eval-after-load 'ox-latex
-  (add-to-list 'org-latex-classes
-               '("tuftebook"
-                 "\\documentclass{tufte-book}\n
-  \\usepackage{color}
-  \\usepackage{amssymb}
-  \\usepackage{gensymb}
-  \\usepackage{nicefrac}
-  \\usepackage{units}"
-                 ("\\section{%s}" . "\\section*{%s}")
-                 ("\\subsection{%s}" . "\\subsection*{%s}")
-                 ("\\paragraph{%s}" . "\\paragraph*{%s}")
-                 ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
-#+END_SRC
-
-
-** python
-:PROPERTIES:
-:ID:       78c06252-2655-431c-9633-cb04f2300838
-:END:
-
-#+BEGIN_SRC emacs-lisp
-  (setq ein:use-auto-complete t)
-  (setq-default indent-tabs-mode nil)
-#+END_SRC
-
-
-** js
-
-#+BEGIN_SRC emacs-lisp :results silent
-(defun move-line-up ()
-  (interactive)
-  (transpose-lines 1)
-  (forward-line -2))
-
-(defun move-line-down ()
-  (interactive)
-  (forward-line 1)
-  (transpose-lines 1)
-  (forward-line -1))
-
-;; (define-key js2-mode-map (kbd "M-<up>") 'move-line-up)
-;; (define-key js2-mode-map (kbd "M-<down>") 'move-line-down)
-#+END_SRC
-
-
-** yasnippet
-:PROPERTIES:
-:ID:       5e5563ce-fd71-4057-b12f-06b9447f2814
-:END:
-
-#+BEGIN_SRC emacs-lisp
-  ;; (setq yas-snippet-dirs '("/home/m/.emacs.d/snippets/"))
-  ;; (add-hook 'html-mode 'yas-minor-mode)
-#+END_SRC
-
-
-** simple transcript mode
-:PROPERTIES:
-:ID:       e5b66427-3a3d-4832-a62e-e0b6080dc580
-:END:
-
-#+BEGIN_SRC emacs-lisp 
-
-(define-minor-mode m/transcript-mode "for transcripts"
-  :lighter "Transcript"
-  :keymap (let ((map (make-sparse-keymap)))
-            (define-key map (kbd "M-<left>") 'mau/rewind-mpd-seconds)
-            (define-key map (kbd "M-<right>") 'mau/forward-mpd-seconds)
-            (define-key map (kbd "M-<up>") 'mau/toggle-mpd)
-            (define-key map (kbd "M-<down>") 'mau/insert-mpd-timestamp)
-            (define-key map (kbd "C-c  RET") 'mau/goto-mpd-seconds)
-            map)
-
-  ;; (defun mau/insert-mpd-timestamp ()
-  ;;   (interactive)
-  ;;   (insert
-  ;;    (concat "["
-  ;;            (nth 0
-  ;;                 (split-string
-  ;;                  (shell-command-to-string "mpc | awk 'FNR == 2 {print $3}'") "/")
-  ;;                 )
-  ;;            )
-  ;;    "] ")
-  ;;   )
-
-    (defun mau/insert-mpd-timestamp ()
-    (interactive)
-    (insert
-     (concat "◊time{"
-             (nth 0
-                  (split-string
-                   (shell-command-to-string "mpc | awk 'FNR == 2 {print $3}'") "/")
-                  )
-             )
-     "}
-")
-    )
-
-  (defun mau/rewind-mpd-seconds ()
-    (interactive)
-    (shell-command-to-string "mpc seek -2"))
-
-  (defun mau/forward-mpd-seconds ()
-    (interactive)
-    (shell-command-to-string "mpc seek +2"))
-
-  (defun mau/goto-mpd-seconds (n)
-    (interactive "sseconds (- or +): ")
-    (shell-command-to-string (concat "mpc seek " n)))
-
-  (defun mau/toggle-mpd ()
-    (interactive)
-    (shell-command-to-string "mpc seek -1")
-    (shell-command-to-string "mpc toggle"))
-
-  )
-#+END_SRC
-
-** projectile
-
-#+BEGIN_SRC emacs-lisp :results silent
-  (projectile-mode)
-  (require 'helm-projectile)
-  (helm-projectile-on)
-#+END_SRC
-
-
-** pollen
-
-#+BEGIN_SRC emacs-lisp 
-(require 'pollen-mode)
-(require 'company-pollen)
-(add-hook 'pollen-mode-hook 'variable-pitch-mode)
-#+END_SRC
-
-
-** hi-lock
-
-#+BEGIN_SRC emacs-lisp 
-(global-hi-lock-mode)
-(setq hi-lock-file-patterns-policy #'(lambda (dummy) t))
-#+END_SRC
-
-
-
 
 
 
